@@ -217,15 +217,15 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 
 
 ## 2021-08-14 진행상황
-*** 
+
 - EC2 서버 구축
 - dev / prod 폴더 나누어서 서브 도메인 적용
 - dev 폴더에 Spring-boot 템플릿 적용
 - ERD 설계 중
 - 개발 이슈
   - git clone하기
-    - 원인: git clone을 할 때 인증 과정에서 git의 personal access token을 발급받아야한다는 것을 몰랐음.
-    - 해결: git 인증 과정에서 URl 및 비밀번호에 발급받은 토큰을 입력함.
+    - 원인: git clone을 할 때 인증 과정에서 git의 personal access token을 발급받아야 한다는 것을 몰랐음 / repository not found 오류
+    - 해결: git 인증 과정에서 URl 및 비밀번호에 발급받은 토큰을 입력함 / url에서 userName을 내 git이름에서 mock-14th로 수정
 
 
   - Spring-boot와 RDS 연결하기
