@@ -222,6 +222,8 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 - dev / prod 폴더 나누어서 서브 도메인 적용
 - dev 폴더에 Spring-boot 템플릿 적용
 - ERD 설계 중
+
+
 - 개발 이슈
   - git clone하기
     - 원인: git clone을 할 때 인증 과정에서 git의 personal access token을 발급받아야 한다는 것을 몰랐음 / repository not found 오류
@@ -231,3 +233,11 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
   - Spring-boot와 RDS 연결하기
     - 원인: 9000번 포트가 이미 사용 중이었고, rds 인바운드 규칙에 해당 포트번호를 추가하지 않음.
     - 해결: 8000번 포트로 지정, rds 인바운드 규칙에 8000번 포트를 추가함
+
+
+## 2021-08-15 진행상황
+
+
+- Let's Encrypt 자동갱신 추가
+- ERD 설계 90% 완료
+- 
