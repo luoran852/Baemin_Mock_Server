@@ -247,3 +247,17 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 - 개발 이슈
     - gitignore 적용 안됨
         - 해결: cache를 삭제하고 다시 커밋함
+
+
+## 2021-08-16 진행상황
+
+
+- ERD 설계 완료, DB에 넣기
+- 회원가입 api 추가
+- 명세서/api 리스트 작성
+
+
+- 개발 이슈
+    - 'Cannot resolve symbol' 에러가 남
+      - 원인: 프로젝트 구조가 뒤엉킴.
+      - 해결: File -> Project Structure에서 프로젝트 구조를 올바르게 수정함.

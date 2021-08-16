@@ -8,8 +8,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PostUserReq {
-    private String UserName;
-    private String id;
+    private String nickname;
     private String email;
-    private String password;
+    private String pwd;
+    private String phoneNum;
+    private String birthDate;
 }
