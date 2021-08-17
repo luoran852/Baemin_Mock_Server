@@ -73,65 +73,79 @@ public class UserController {
     }
 
     /**
-     * 로그인 API
-     * [POST] /users/logIn
-     * @return BaseResponse<PostLoginRes>
+     * 이메일 중복체크 API
+     * [POST] /users/email
+     * @return BaseResponse<result>
      */
-//    @ResponseBody
-//    @PostMapping("/logIn")
-//    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq){
-//        try{
-//            // TODO: 로그인 값들에 대한 형식적인 validatin 처리해주셔야합니다!
-//            // TODO: 유저의 status ex) 비활성화된 유저, 탈퇴한 유저 등을 관리해주고 있다면 해당 부분에 대한 validation 처리도 해주셔야합니다.
-//            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
-//            return new BaseResponse<>(postLoginRes);
-//        } catch (BaseException exception){
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
+    @ResponseBody
+    @PostMapping("/email") // (POST) 15.165.16.88:8000/users/email
+    public BaseResponse<PostEmailCheckRes> emailCheck(@RequestBody PostEmailCheckReq postEmailCheckReq){
+        // 이메일 빈값 체크
+        if(postEmailCheckReq.getEmail() == null){
+            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        }
+
+        try{
+            PostEmailCheckRes postEmailCheckRes = userService.emailCheck(postEmailCheckReq);
+            return new BaseResponse<>(postEmailCheckRes);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
     /**
-     * 회원 조회 API
-     * [GET] /users
-     * 회원 번호 및 이메일 검색 조회 API
-     * [GET] /users? Email=
-     * @return BaseResponse<List<GetUserRes>>
+     * 로그인 API
+     * [POST] /users/login
+     * @return BaseResponse<PostLoginRes>
      */
-//    //Query String
-//    @ResponseBody
-//    @GetMapping("") // (GET) 127.0.0.1:9000/app/users
-//    public BaseResponse<List<GetUserRes>> getUsers(@RequestParam(required = false) String Email) {
-//        try{
-//            if(Email == null){
-//                List<GetUserRes> getUsersRes = userProvider.getUsers();
-//                return new BaseResponse<>(getUsersRes);
-//            }
-//            // Get Users
-//            List<GetUserRes> getUsersRes = userProvider.getUsersByEmail(Email);
-//            return new BaseResponse<>(getUsersRes);
-//        } catch(BaseException exception){
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
+    @ResponseBody
+    @PostMapping("/login") // (POST) 15.165.16.88:8000/users/login
+    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq){
+        try{
+            // TODO: 로그인 값들에 대한 형식적인 validatin 처리해주셔야합니다!
+            // TODO: 유저의 status ex) 비활성화된 유저, 탈퇴한 유저 등을 관리해주고 있다면 해당 부분에 대한 validation 처리도 해주셔야합니다.
+
+            // 이메일, 비번 빈값 체크
+            if (postLoginReq.getEmail().equals("")){
+                return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+            }
+            if (postLoginReq.getPwd().equals("")){
+                return new BaseResponse<>(POST_USERS_EMPTY_PASSWORD);
+            }
+
+            PostLoginRes postLoginRes = userService.logIn(postLoginReq);
+            return new BaseResponse<>(postLoginRes);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 
     /**
      * 회원 1명 조회 API
-     * [GET] /users/:userIdx
+     * [GET] /users/my-page/:userIdx
      * @return BaseResponse<GetUserRes>
      */
-//    // Path-variable
-//    @ResponseBody
-//    @GetMapping("/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
-//    public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
-//        // Get Users
-//        try{
-//            GetUserRes getUserRes = userProvider.getUser(userIdx);
-//            return new BaseResponse<>(getUserRes);
-//        } catch(BaseException exception){
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//
-//    }
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/{userIdx}") // (GET) 15.165.16.88:8000/users/my-page/:userIdx
+    public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
+        // Get Users
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+            GetUserRes getUserRes = userProvider.getUser(userIdx);
+            return new BaseResponse<>(getUserRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
 
 
 

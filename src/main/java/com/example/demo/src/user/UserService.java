@@ -35,7 +35,7 @@ public class UserService {
 
     }
 
-    //POST
+    // [POST] 회원가입 API
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
         // 이메일 중복 체크
         if(userProvider.checkEmail(postUserReq.getEmail()) ==1){
@@ -59,6 +59,42 @@ public class UserService {
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // [POST] 이메일 중복체크 API
+    public PostEmailCheckRes emailCheck(PostEmailCheckReq postEmailCheckReq) throws BaseException {
+        // 이메일 중복 체크
+        if(userProvider.checkEmail(postEmailCheckReq.getEmail()) == 1){
+            throw new BaseException(POST_USERS_EXISTS_EMAIL);
+        }
+
+        try{
+            String result = "";
+            return new PostEmailCheckRes(result);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [POST] 로그인 API
+    public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException {
+        User user = userDao.getPwd(postLoginReq);
+        String password;
+        try {
+            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).decrypt(user.getPwd());
+        } catch (Exception ignored) {
+            throw new BaseException(PASSWORD_DECRYPTION_ERROR);
+        }
+
+        if(postLoginReq.getPwd().equals(password)){
+            int userIdx = userDao.getPwd(postLoginReq).getIdx();
+            String jwt = jwtService.createJwt(userIdx);
+            return new PostLoginRes(userIdx,jwt);
+        }
+        else{
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+
     }
 
 }
