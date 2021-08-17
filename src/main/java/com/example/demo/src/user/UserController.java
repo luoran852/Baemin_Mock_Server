@@ -13,7 +13,7 @@ import java.util.List;
 
 
 import static com.example.demo.config.BaseResponseStatus.*;
-import static com.example.demo.utils.ValidationRegex.isRegexEmail;
+import static com.example.demo.utils.ValidationRegex.*;
 
 @RestController
 @RequestMapping("/users")
@@ -38,12 +38,12 @@ public class UserController {
 
     /**
      * 회원가입 API
-     * [POST] /users
+     * [POST] /users/sign-up
      * @return BaseResponse<PostUserRes>
      */
     // Body
     @ResponseBody
-    @PostMapping("")
+    @PostMapping("/sign-up") // (POST) 15.165.16.88:8000/users/sign-up
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
         // TODO: email 관련한 짧은 validation 예시입니다. 그 외 더 부가적으로 추가해주세요!
 
@@ -51,13 +51,18 @@ public class UserController {
         if(postUserReq.getEmail() == null){
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
-
-
         //이메일 정규표현
         if(!isRegexEmail(postUserReq.getEmail())){
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
         }
-        //비밀번호 정규표현
+        //비밀번호 정규표현 (최소 8 자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자)
+        if(!isRegexPwd(postUserReq.getPwd())){
+            return new BaseResponse<>(POST_USERS_INVALID_PASSWORD);
+        }
+        //휴대폰 번호 정규표현
+        if(!isRegexPhoneNum(postUserReq.getPhoneNum())){
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+        }
 
         try{
             PostUserRes postUserRes = userService.createUser(postUserReq);
