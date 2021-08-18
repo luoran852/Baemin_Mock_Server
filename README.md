@@ -269,7 +269,7 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 - 회원가입, 로그인, 유저조회 API 개발 / 명세서 작성
 - ERD, API list 수정 (1차 피드백 반영)
 - 유저 더미데이터 넣기
-- 이메일 중복체크 API 수정 중
+- 이메일 중복체크 API 수정중
 
 
 ## 2021-08-18 진행상황
@@ -277,4 +277,4 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 
 - 이미지 url 생성 / 더미데이터 넣기 (type, category, store, food, flavor, coupon)
 - 가게리스트 조회 쿼리문 작성
-- api url 수정, 가게리스트 조회 api 작성 중
+- api url 수정, 가게리스트 조회 api 작성중
