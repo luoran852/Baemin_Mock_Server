@@ -128,7 +128,7 @@ public class UserController {
      */
     // Path-variable
     @ResponseBody
-    @GetMapping("/{userIdx}") // (GET) 15.165.16.88:8000/users/my-page/:userIdx
+    @GetMapping("/my-page/{userIdx}") // (GET) 15.165.16.88:8000/users/my-page/:userIdx
     public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
         // Get Users
         try{
