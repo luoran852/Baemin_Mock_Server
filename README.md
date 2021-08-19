@@ -278,3 +278,17 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 - 이미지 url 생성 / 더미데이터 넣기 (type, category, store, food, flavor, coupon)
 - 가게리스트 조회 쿼리문 작성
 - api url 수정, 가게리스트 조회 api 작성중
+
+
+## 2021-08-19 진행상황
+
+
+- ERD 수정 (상호명, 가게소개 이미지url 추가, 배달팁안내, 위생정보내역 삭제)
+- 이미지url 생성/더미데이터 추가 (store, menu, food, flavor, coupon, review)
+- 유저정보조회 api 수정 
+- 가게리스트 조회 쿼리문/api 수정
+
+
+- 개발 이슈
+    - Dao에서 여러 쿼리문을 response에 동시에 보내는 법을 몰랐음
+        - 해결: Dao에서 새로 추가할 쿼리용 함수를 새로 만들고 response를 return할 때 가져옴
