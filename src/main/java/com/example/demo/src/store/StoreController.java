@@ -60,6 +60,30 @@ public class StoreController {
         }
     }
 
+    /**
+     * 가게 리스트 조회 API
+     * [GET] /users
+     * 회원 번호 및 이메일 검색 조회 API
+     * [GET] /users? Email=
+     * @return BaseResponse<List<GetUserRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/list") // (GET) 127.0.0.1:9000/app/users
+    public BaseResponse<List<GetUserRes>> getStoreLists(@RequestParam(required = false) String Email) {
+        try{
+            if(Email == null){
+                List<GetUserRes> getUsersRes = userProvider.getUsers();
+                return new BaseResponse<>(getUsersRes);
+            }
+            // Get Users
+            List<GetUserRes> getUsersRes = userProvider.getUsersByEmail(Email);
+            return new BaseResponse<>(getUsersRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
 
 
