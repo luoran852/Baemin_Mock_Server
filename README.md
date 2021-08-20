@@ -292,3 +292,12 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 - 개발 이슈
     - Dao에서 여러 쿼리문을 response에 동시에 보내는 법을 몰랐음
         - 해결: Dao에서 새로 추가할 쿼리용 함수를 새로 만들고 response를 return할 때 가져옴
+
+
+## 2021-08-20 진행상황
+
+
+- ERD 수정 (Store: 운영 상태, 최근 주문수 삭제, CouponStore 테이블 추가)
+- 이미지url 생성/더미데이터 추가완료 (store, menu, food, flavor, coupon, review, keep)
+- 가게리스트 조회 쿼리/api 수정
+- 가게 세부정보 쿼리 작성중
