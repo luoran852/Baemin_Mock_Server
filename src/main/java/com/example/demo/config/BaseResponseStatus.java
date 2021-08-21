@@ -35,8 +35,9 @@ public enum BaseResponseStatus {
 
     // [GET] /stores
     GET_STORES_TYPE_ERROR(false, 2021, "type을 확인해주세요.(1~7 사이)"),
-    GET_STORES_CATEGORY_ERROR(false, 2021, "category를 확인해주세요.(1~20 사이)"),
-    GET_STORES_SORT_ERROR(false, 2021, "sort를 확인해주세요.(1~3 사이)"),
+    GET_STORES_CATEGORY_ERROR(false, 2022, "category를 확인해주세요.(1~20 사이)"),
+    GET_STORES_SORT_ERROR(false, 2023, "sort를 확인해주세요.(1~3 사이)"),
+    GET_STORES_STOREIDX_ERROR(false, 2024, "storeIdx를 확인해주세요.(1~6 사이)"),
 
 
     /**

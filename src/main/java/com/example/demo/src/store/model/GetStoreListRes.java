@@ -18,7 +18,7 @@ public class GetStoreListRes {
     private int isCoupon;
     private float rating;
     private int reviewNum;
-    private List mainMenu;
+    private List<String> mainMenu;
     private int deliMinOrderPrice;
     private int deliveryTip;
     private int deliveryTime;

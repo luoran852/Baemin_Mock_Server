@@ -78,6 +78,10 @@ public class StoreController {
     public BaseResponse<GetStoreInfoRes> getStoreInfo(@PathVariable("storeIdx") int storeIdx) {
         // Get Users
         try{
+            // storeIdx error message
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
             GetStoreInfoRes getStoreInfoRes = storeProvider.getStoreInfo(storeIdx);
             return new BaseResponse<>(getStoreInfoRes);
         } catch(BaseException exception){

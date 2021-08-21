@@ -11,7 +11,7 @@ import lombok.Setter;
 public class GetStoreInfoRes {
     private String storeName;
     private String foodPosterUrl;
-    private int rating;
+    private float rating;
     private int reviewNum;
     private int bossCommentNum;
     private int keepNum;
@@ -21,10 +21,11 @@ public class GetStoreInfoRes {
     private int deliveryTip;
     private int packMinOrderPrice;
     private String howToUse;
-    private int cookingNum;
+    private int cookingTime;
     private String locationInfo;
     private float storeDistance;
     private String packPayType;
+    private String storeInfo;
     private String storeInfoImgUrl;
     private String storeFullName;
     private String operatingTime;

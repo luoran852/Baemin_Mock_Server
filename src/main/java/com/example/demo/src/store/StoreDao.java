@@ -20,7 +20,7 @@ public class StoreDao {
     }
 
     // [GET] 가게리스트 메인메뉴 조회 API
-    public List<GetMainMenuListRes> getMainMenu(int storeIdx){
+    public List<String> getMainMenu(int storeIdx){
         String getContentsQuery = "select F.foodTxt\n" +
                 "from Store S\n" +
                 "   join Food F on S.idx = F.menuIdx\n" +
@@ -31,8 +31,8 @@ public class StoreDao {
         int getContentsParams = storeIdx;
 
         return this.jdbcTemplate.query(getContentsQuery,
-                (rs, rowNum) -> new GetMainMenuListRes(
-                        rs.getString("foodTxt")),
+                (rs, rowNum) ->
+                        rs.getString("foodTxt"),
                 getContentsParams);
     }
 
@@ -109,46 +109,47 @@ public class StoreDao {
 
     // [GET] 가게 정보 조회 API
     public GetStoreInfoRes getStoreInfo(int storeIdx){
-        String getContentsQuery = "select storeName, foodPosterUrl, S.rating, reviewNum, bossCommentNum, keepNum, deliMinOrderPrice, deliPayType, deliveryTime, deliveryTip, packMinOrderPrice, howToUse, cookingTime, locationInfo, storeDistance, packPayType, storeInfoImgUrl, storeFullName, operatingTime, holiday, storePhoneNum, deliveryArea, guideAndBenefits, RepresentativeName, storeNum\n" +
+        String getContentsQuery = "select storeName, foodPosterUrl, S.rating, reviewNum, bossCommentNum, keepNum, deliMinOrderPrice, deliPayType, deliveryTime, deliveryTip, packMinOrderPrice, howToUse, cookingTime, locationInfo, storeDistance, packPayType, storeInfo, storeInfoImgUrl, storeFullName, operatingTime, holiday, storePhoneNum, deliveryArea, guideAndBenefits, RepresentativeName, storeNum\n" +
                 "from Store S\n" +
                 "join (select R.storeIdx, count(storeIdx) reviewNum\n" +
                 "from Review R\n" +
                 "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx\n" +
                 "join (select BC.storeIdx, count(storeIdx) bossCommentNum\n" +
-                "from BossComment BC, Store S\n" +
+                "from BossComment BC\n" +
                 "group by storeIdx) bossCommentNum on S.idx = bossCommentNum.storeIdx\n" +
                 "join (select K.storeIdx, count(storeIdx) keepNum\n" +
-                "from Keep K, Store S\n" +
+                "from Keep K\n" +
                 "group by storeIdx) keepNum on S.idx = keepNum.storeIdx\n" +
                 "where S.idx = ?";
         int getContentsParams = storeIdx;
         return this.jdbcTemplate.queryForObject(getContentsQuery,
                 (rs, rowNum) -> new GetStoreInfoRes(
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getInt("profileUrl"),
-                        rs.getFloat("profileUrl"),
-                        rs.getString("profileUrl"),
-                        rs.getString("nickname"),
-                        rs.getString("email"),
-                        rs.getString("email"),
-                        rs.getString("userRate"),
-                        rs.getString("profileUrl"),
-                        rs.getString("nickname"),
-                        rs.getString("email"),
-                        rs.getString("email"),
-                        rs.getString("userRate"),
-                        rs.getString("profileUrl"),
-                        rs.getString("nickname"),
-                        rs.getString("email"),
-                        rs.getString("email"),
-                        rs.getString("userRate")),
+                        rs.getString("storeName"),
+                        rs.getString("foodPosterUrl"),
+                        rs.getFloat("rating"),
+                        rs.getInt("reviewNum"),
+                        rs.getInt("bossCommentNum"),
+                        rs.getInt("keepNum"),
+                        rs.getInt("deliMinOrderPrice"),
+                        rs.getString("deliPayType"),
+                        rs.getInt("deliveryTime"),
+                        rs.getInt("deliveryTip"),
+                        rs.getInt("packMinOrderPrice"),
+                        rs.getString("howToUse"),
+                        rs.getInt("cookingTime"),
+                        rs.getString("locationInfo"),
+                        rs.getFloat("storeDistance"),
+                        rs.getString("packPayType"),
+                        rs.getString("storeInfo"),
+                        rs.getString("storeInfoImgUrl"),
+                        rs.getString("storeFullName"),
+                        rs.getString("operatingTime"),
+                        rs.getString("holiday"),
+                        rs.getString("storePhoneNum"),
+                        rs.getString("deliveryArea"),
+                        rs.getString("guideAndBenefits"),
+                        rs.getString("RepresentativeName"),
+                        rs.getString("storeNum")),
                 getContentsParams);
     }
 
