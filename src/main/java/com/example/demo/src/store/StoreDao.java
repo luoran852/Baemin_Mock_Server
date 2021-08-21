@@ -107,5 +107,50 @@ public class StoreDao {
         );
     }
 
+    // [GET] 가게 정보 조회 API
+    public GetStoreInfoRes getStoreInfo(int storeIdx){
+        String getContentsQuery = "select storeName, foodPosterUrl, S.rating, reviewNum, bossCommentNum, keepNum, deliMinOrderPrice, deliPayType, deliveryTime, deliveryTip, packMinOrderPrice, howToUse, cookingTime, locationInfo, storeDistance, packPayType, storeInfoImgUrl, storeFullName, operatingTime, holiday, storePhoneNum, deliveryArea, guideAndBenefits, RepresentativeName, storeNum\n" +
+                "from Store S\n" +
+                "join (select R.storeIdx, count(storeIdx) reviewNum\n" +
+                "from Review R\n" +
+                "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx\n" +
+                "join (select BC.storeIdx, count(storeIdx) bossCommentNum\n" +
+                "from BossComment BC, Store S\n" +
+                "group by storeIdx) bossCommentNum on S.idx = bossCommentNum.storeIdx\n" +
+                "join (select K.storeIdx, count(storeIdx) keepNum\n" +
+                "from Keep K, Store S\n" +
+                "group by storeIdx) keepNum on S.idx = keepNum.storeIdx\n" +
+                "where S.idx = ?";
+        int getContentsParams = storeIdx;
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetStoreInfoRes(
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getInt("profileUrl"),
+                        rs.getFloat("profileUrl"),
+                        rs.getString("profileUrl"),
+                        rs.getString("nickname"),
+                        rs.getString("email"),
+                        rs.getString("email"),
+                        rs.getString("userRate"),
+                        rs.getString("profileUrl"),
+                        rs.getString("nickname"),
+                        rs.getString("email"),
+                        rs.getString("email"),
+                        rs.getString("userRate"),
+                        rs.getString("profileUrl"),
+                        rs.getString("nickname"),
+                        rs.getString("email"),
+                        rs.getString("email"),
+                        rs.getString("userRate")),
+                getContentsParams);
+    }
+
 
 }

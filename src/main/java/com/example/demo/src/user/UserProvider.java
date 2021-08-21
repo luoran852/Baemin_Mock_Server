@@ -32,6 +32,7 @@ public class UserProvider {
     }
 
 
+    // [GET] 회원 1명 조회 API
     public GetUserRes getUser(int userIdx) throws BaseException {
         try {
             GetUserRes getUserRes = userDao.getUser(userIdx);

@@ -43,4 +43,14 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 가게 정보 조회 API
+    public GetStoreInfoRes getStoreInfo(int storeIdx) throws BaseException {
+        try {
+            GetStoreInfoRes getStoreInfoRes = storeDao.getStoreInfo(storeIdx);
+            return getStoreInfoRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

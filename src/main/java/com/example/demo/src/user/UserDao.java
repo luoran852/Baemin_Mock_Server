@@ -20,6 +20,7 @@ public class UserDao {
     }
 
 
+    // [GET] 회원 1명 조회 API
     public GetUserRes getUser(int userIdx){
         String getUserQuery = "select profileUrl, nickname, email, phoneNum, userRate\n" +
                 "from User\n" +
@@ -34,8 +35,9 @@ public class UserDao {
                         rs.getString("userRate")),
                 getUserParams);
     }
-    
 
+
+    // [POST] 회원가입 API
     public int createUser(PostUserReq postUserReq){
         String createUserQuery = "insert into User (nickname, email, pwd, phoneNum, bitrhDate) VALUES (?,?,?,?,?)";
         Object[] createUserParams = new Object[]{postUserReq.getNickname(), postUserReq.getEmail(), postUserReq.getPwd(), postUserReq.getPhoneNum(), postUserReq.getBirthDate()};
@@ -55,6 +57,7 @@ public class UserDao {
     }
 
 
+    // [POST] 로그인 API
     public User getPwd(PostLoginReq postLoginReq){
         String getPwdQuery = "select idx, nickname, email, pwd, phoneNum\n" +
                 "from User\n" +

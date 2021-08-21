@@ -67,6 +67,24 @@ public class StoreController {
         }
     }
 
+    /**
+     * 가게 정보 조회 API
+     * [GET] /stores/:storeIdx/info
+     * @return BaseResponse<GetUserRes>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/{storeIdx}/info") // (GET) 15.165.16.88:8000/stores/:storeIdx/info
+    public BaseResponse<GetStoreInfoRes> getStoreInfo(@PathVariable("storeIdx") int storeIdx) {
+        // Get Users
+        try{
+            GetStoreInfoRes getStoreInfoRes = storeProvider.getStoreInfo(storeIdx);
+            return new BaseResponse<>(getStoreInfoRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
 
 
 
