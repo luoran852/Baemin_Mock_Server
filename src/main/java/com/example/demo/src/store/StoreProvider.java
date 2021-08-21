@@ -32,10 +32,11 @@ public class StoreProvider {
     }
 
 
-    public List<GetUserRes> getUsers() throws BaseException{
+    // [GET] 가게 리스트 조회 API
+    public List<GetStoreListRes> getStoreLists(int type, int category, int sort) throws BaseException{
         try{
-            List<GetUserRes> getUserRes = userDao.getUsers();
-            return getUserRes;
+            List<GetStoreListRes> getStoreListRes = storeDao.getStoreLists(type, category, sort);
+            return getStoreListRes;
         }
         catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);

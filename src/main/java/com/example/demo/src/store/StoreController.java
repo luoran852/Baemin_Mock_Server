@@ -36,49 +36,32 @@ public class StoreController {
         this.jwtService = jwtService;
     }
 
-    /**
-     * 우리동네 빠른배달 조회 API
-     * [GET] /users
-     * 회원 번호 및 이메일 검색 조회 API
-     * [GET] /users? Email=
-     * @return BaseResponse<List<GetUserRes>>
-     */
-    //Query String
-    @ResponseBody
-    @GetMapping("/fast-delivery") // (GET) 127.0.0.1:9000/app/users
-    public BaseResponse<List<GetUserRes>> getFastDelivery(@RequestParam(required = false) String Email) {
-        try{
-            if(Email == null){
-                List<GetUserRes> getUsersRes = userProvider.getUsers();
-                return new BaseResponse<>(getUsersRes);
-            }
-            // Get Users
-            List<GetUserRes> getUsersRes = userProvider.getUsersByEmail(Email);
-            return new BaseResponse<>(getUsersRes);
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
 
     /**
      * 가게 리스트 조회 API
-     * [GET] /users
-     * 회원 번호 및 이메일 검색 조회 API
-     * [GET] /users? Email=
-     * @return BaseResponse<List<GetUserRes>>
+     * [GET] /stores/list?type=?&category=?&sort=?
+     * @return BaseResponse<List<GetStoreListRes>>
      */
     //Query String
     @ResponseBody
-    @GetMapping("/list") // (GET) 127.0.0.1:9000/app/users
-    public BaseResponse<List<GetUserRes>> getStoreLists(@RequestParam(required = false) String Email) {
+    @GetMapping("/list") // (GET) 15.165.16.88:8000/stores/list?type=?&category=?&sort=?
+    public BaseResponse<List<GetStoreListRes>> getStoreLists(@RequestParam int type, @RequestParam int category, @RequestParam int sort) {
         try{
-            if(Email == null){
-                List<GetUserRes> getUsersRes = userProvider.getUsers();
-                return new BaseResponse<>(getUsersRes);
+            // type error message
+            if (type < 1 || type > 8) {
+                return new BaseResponse<>(GET_STORES_TYPE_ERROR);
             }
-            // Get Users
-            List<GetUserRes> getUsersRes = userProvider.getUsersByEmail(Email);
-            return new BaseResponse<>(getUsersRes);
+            // category error message
+            if (category < 1 || category > 20) {
+                return new BaseResponse<>(GET_STORES_CATEGORY_ERROR);
+            }
+            // sort error message
+            if (sort < 1 || sort > 3) {
+                return new BaseResponse<>(GET_STORES_SORT_ERROR);
+            }
+            // Get store lists
+            List<GetStoreListRes> getStoreListRes = storeProvider.getStoreLists(type, category, sort);
+            return new BaseResponse<>(getStoreListRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }

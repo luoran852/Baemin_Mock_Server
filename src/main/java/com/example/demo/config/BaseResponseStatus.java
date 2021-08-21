@@ -33,6 +33,10 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_PASSWORD(false, 2019, "비밀번호 형식을 확인해주세요.(최소 8자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자)"),
     POST_USERS_INVALID_PHONE(false, 2020, "휴대폰번호 형식을 확인해주세요."),
 
+    // [GET] /stores
+    GET_STORES_TYPE_ERROR(false, 2021, "type을 확인해주세요.(1~7 사이)"),
+    GET_STORES_CATEGORY_ERROR(false, 2021, "category를 확인해주세요.(1~20 사이)"),
+    GET_STORES_SORT_ERROR(false, 2021, "sort를 확인해주세요.(1~3 사이)"),
 
 
     /**
