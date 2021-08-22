@@ -1,10 +1,7 @@
 package com.example.demo.src.store;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.config.secret.Secret;
 import com.example.demo.src.store.model.*;
-import com.example.demo.src.user.model.GetUserRes;
-import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +51,9 @@ public class StoreProvider {
     }
 
     // [GET] 가게 메뉴 조회 API
-    public List<GetStoreMenuRes> getStoreMenu(int storeIdx) throws BaseException{
+    public GetStoreMenuRes getStoreMenu(int storeIdx) throws BaseException{
         try{
-            List<GetStoreMenuRes> getStoreMenuRes = storeDao.getStoreMenu(storeIdx);
+            GetStoreMenuRes getStoreMenuRes = storeDao.getStoreMenu(storeIdx);
             return getStoreMenuRes;
         }
         catch (Exception exception) {

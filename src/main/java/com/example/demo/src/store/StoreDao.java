@@ -1,7 +1,6 @@
 package com.example.demo.src.store;
 
 import com.example.demo.src.store.model.*;
-import com.example.demo.src.user.model.GetUserRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -154,8 +153,25 @@ public class StoreDao {
                 getContentsParams);
     }
 
-    // [GET] 가게 메뉴 조회 API
-    public List<GetStoreMenuRes> getStoreMenu(int storeIdx){
+
+    // [GET] 가게 메뉴공지 조회 API
+    public GetStoreMenuRes getStoreMenu(int storeIdx){
+        String getContentsQuery = "select M.menuInfo, M.foodTypeNum, M.foodOrigin\n" +
+                "from Menu M\n" +
+                "where M.storeIdx = ?";
+        int getContentsParams = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetStoreMenuRes(
+                        rs.getString("menuInfo"),
+                        rs.getInt("foodTypeNum"),
+                        rs.getString("foodOrigin"),
+                        getMenuInfo(storeIdx)),
+                getContentsParams);
+    }
+
+    // [GET] 가게 메뉴 조회 API (추가쿼리)
+    public List<GetMenuInfoRes> getMenuInfo(int storeIdx){
         String getContentsQuery = "select F.idx foodIdx, F.foodTxt, FTF.foodTypeIdx, F.foodComment, F.foodPrice, F.foodImgUrl, F.isPopular, F.isSoldOut, F.isAlcohol\n" +
                 "from Food F\n" +
                 "join FoodTypeFood FTF on F.idx = FTF.foodIdx\n" +
@@ -164,8 +180,7 @@ public class StoreDao {
         int getContentsParams = storeIdx;
 
         return this.jdbcTemplate.query(getContentsQuery,
-                (rs, rowNum) -> new GetStoreMenuRes(
-                        getMenuInfo(storeIdx),
+                (rs, rowNum) -> new GetMenuInfoRes(
                         rs.getInt("foodIdx"),
                         rs.getString("foodTxt"),
                         rs.getInt("foodTypeIdx"),
@@ -175,21 +190,6 @@ public class StoreDao {
                         rs.getInt("isPopular"),
                         rs.getInt("isSoldOut"),
                         rs.getInt("isAlcohol")),
-                getContentsParams);
-    }
-
-    // [GET] 가게 메뉴공지 조회 API (추가쿼리)
-    public GetMenuInfoRes getMenuInfo(int storeIdx){
-        String getContentsQuery = "select M.menuInfo, M.foodTypeNum, M.foodOrigin\n" +
-                "from Menu M\n" +
-                "where M.storeIdx = ?";
-        int getContentsParams = storeIdx;
-
-        return this.jdbcTemplate.queryForObject(getContentsQuery,
-                (rs, rowNum) -> new GetMenuInfoRes(
-                        rs.getString("menuInfo"),
-                        rs.getInt("foodTypeNum"),
-                        rs.getString("foodOrigin")),
                 getContentsParams);
     }
 

@@ -3,7 +3,6 @@ package com.example.demo.src.store;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.store.model.*;
-import com.example.demo.src.user.model.GetUserRes;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
-import static com.example.demo.config.BaseResponseStatus.INVALID_USER_JWT;
-import static com.example.demo.utils.ValidationRegex.*;
 
 
 @RestController
@@ -92,15 +89,15 @@ public class StoreController {
     /**
      * 가게 메뉴 조회 API
      * [GET] /stores/menu/:storeIdx
-     * @return BaseResponse<List<GetStoreListRes>>
+     * @return BaseResponse<getStoreMenuRes>
      */
     //Query String
     @ResponseBody
     @GetMapping("/menu/{storeIdx}") // (GET) 15.165.16.88:8000/stores/menu/:storeIdx
-    public BaseResponse<List<GetStoreMenuRes>> getStoreMenu(@PathVariable("storeIdx") int storeIdx) {
+    public BaseResponse<GetStoreMenuRes> getStoreMenu(@PathVariable("storeIdx") int storeIdx) {
         try{
             // Get store menu
-            List<GetStoreMenuRes> getStoreMenuRes = storeProvider.getStoreMenu(storeIdx);
+            GetStoreMenuRes getStoreMenuRes = storeProvider.getStoreMenu(storeIdx);
             return new BaseResponse<>(getStoreMenuRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
