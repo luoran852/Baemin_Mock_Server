@@ -84,6 +84,10 @@ public class UserController {
         if(postEmailCheckReq.getEmail() == null){
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
+        //휴대폰 번호 정규표현
+        if(!isRegexPhoneNum(postEmailCheckReq.getPhoneNum())){
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+        }
 
         try{
             PostEmailCheckRes postEmailCheckRes = userService.emailCheck(postEmailCheckReq);

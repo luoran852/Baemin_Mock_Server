@@ -9,4 +9,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostEmailCheckReq {
     private String email;
+    private String phoneNum;
 }

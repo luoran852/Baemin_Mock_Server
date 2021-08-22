@@ -69,7 +69,7 @@ public class UserService {
         }
 
         try{
-            String result = "";
+            String result = "휴대폰 번호, 이메일 인증 성공";
             return new PostEmailCheckRes(result);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
