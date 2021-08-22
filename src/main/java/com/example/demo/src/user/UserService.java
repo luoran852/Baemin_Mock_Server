@@ -61,7 +61,7 @@ public class UserService {
         }
     }
 
-    // [POST] 이메일 중복체크 API
+    // [POST] 휴대폰번호 인증, 이메일 중복체크 API
     public PostEmailCheckRes emailCheck(PostEmailCheckReq postEmailCheckReq) throws BaseException {
         // 이메일 중복 체크
         if(userProvider.checkEmail(postEmailCheckReq.getEmail()) == 1){

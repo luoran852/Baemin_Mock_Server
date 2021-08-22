@@ -73,12 +73,12 @@ public class UserController {
     }
 
     /**
-     * 이메일 중복체크 API
-     * [POST] /users/email
+     * 휴대폰번호 인증, 이메일 중복체크 API
+     * [POST] /users/phone-email
      * @return BaseResponse<result>
      */
     @ResponseBody
-    @PostMapping("/email") // (POST) 15.165.16.88:8000/users/email
+    @PostMapping("/phone-email") // (POST) 15.165.16.88:8000/users/phone-email
     public BaseResponse<PostEmailCheckRes> emailCheck(@RequestBody PostEmailCheckReq postEmailCheckReq){
         // 이메일 빈값 체크
         if(postEmailCheckReq.getEmail() == null){
