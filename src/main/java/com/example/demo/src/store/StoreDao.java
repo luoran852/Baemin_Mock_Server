@@ -41,7 +41,7 @@ public class StoreDao {
         String getContentsQuery = "";
         int getContentsParams1 = 0, getContentsParams2 = 0;
 
-        // 기본순 가게리스트 정렬
+        // 배달 빠른 순 가게리스트 정렬
         if (sort == 1) {
             getContentsQuery = "select S.idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, S.rating, reviewNum, deliMinOrderPrice, deliveryTip, deliveryTime\n" +
                     "from Store S\n" +
@@ -50,7 +50,8 @@ public class StoreDao {
                     "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx,\n" +
                     "     Category Ca join CategoryStore CS on Ca.idx = CS.idx,\n" +
                     "     Type T join TypeStore TS on T.idx = TS.idx\n" +
-                    "where T.idx = ? and Ca.idx = ?";
+                    "where T.idx = ? and Ca.idx = ?\n" +
+                    "order by deliveryTime asc";
 
             getContentsParams1 = type;
             getContentsParams2 = category;
@@ -72,7 +73,7 @@ public class StoreDao {
             getContentsParams2 = category;
         }
 
-        // 배달 빠른 순 가게리스트 정렬
+        // 기본순 가게리스트 정렬
         if (sort == 3) {
             getContentsQuery = "select S.idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, S.rating, reviewNum, deliMinOrderPrice, deliveryTip, deliveryTime\n" +
                     "from Store S\n" +
@@ -81,8 +82,7 @@ public class StoreDao {
                     "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx,\n" +
                     "     Category Ca join CategoryStore CS on Ca.idx = CS.idx,\n" +
                     "     Type T join TypeStore TS on T.idx = TS.idx\n" +
-                    "where T.idx = ? and Ca.idx = ?\n" +
-                    "order by deliveryTime asc";
+                    "where T.idx = ? and Ca.idx = ?";
 
             getContentsParams1 = type;
             getContentsParams2 = category;
