@@ -53,4 +53,26 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 가게 메뉴 조회 API
+    public List<GetStoreMenuRes> getStoreMenu(int storeIdx) throws BaseException{
+        try{
+            List<GetStoreMenuRes> getStoreMenuRes = storeDao.getStoreMenu(storeIdx);
+            return getStoreMenuRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [GET] 가게 음식담기 조회 API
+    public GetFoodInfoRes getFoodInfo(int foodIdx) throws BaseException {
+        try {
+            GetFoodInfoRes getFoodInfoRes = storeDao.getFoodInfo(foodIdx);
+            return getFoodInfoRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
 }

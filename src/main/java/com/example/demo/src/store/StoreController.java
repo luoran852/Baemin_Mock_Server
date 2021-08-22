@@ -76,7 +76,7 @@ public class StoreController {
     @ResponseBody
     @GetMapping("/{storeIdx}/info") // (GET) 15.165.16.88:8000/stores/:storeIdx/info
     public BaseResponse<GetStoreInfoRes> getStoreInfo(@PathVariable("storeIdx") int storeIdx) {
-        // Get Users
+        // Get Store Info
         try{
             // storeIdx error message
             if (storeIdx < 1 || storeIdx > 6) {
@@ -87,7 +87,42 @@ public class StoreController {
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
+    }
 
+    /**
+     * 가게 메뉴 조회 API
+     * [GET] /stores/menu/:storeIdx
+     * @return BaseResponse<List<GetStoreListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/menu/{storeIdx}") // (GET) 15.165.16.88:8000/stores/menu/:storeIdx
+    public BaseResponse<List<GetStoreMenuRes>> getStoreMenu(@PathVariable("storeIdx") int storeIdx) {
+        try{
+            // Get store menu
+            List<GetStoreMenuRes> getStoreMenuRes = storeProvider.getStoreMenu(storeIdx);
+            return new BaseResponse<>(getStoreMenuRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 가게 음식담기 조회 API
+     * [GET] /stores/food/:foodIdx
+     * @return BaseResponse<GetUserRes>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/food/{foodIdx}") // (GET) 15.165.16.88:8000/stores/food/:foodIdx
+    public BaseResponse<GetFoodInfoRes> getFoodInfo(@PathVariable("foodIdx") int foodIdx) {
+        // Get Food Info
+        try{
+            GetFoodInfoRes getFoodInfoRes = storeProvider.getFoodInfo(foodIdx);
+            return new BaseResponse<>(getFoodInfoRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
     }
 
 
