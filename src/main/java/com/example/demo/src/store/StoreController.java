@@ -107,7 +107,7 @@ public class StoreController {
     /**
      * 가게 음식담기 조회 API
      * [GET] /stores/food/:foodIdx
-     * @return BaseResponse<GetUserRes>
+     * @return BaseResponse<GetFoodInfoRes>
      */
     // Path-variable
     @ResponseBody
@@ -117,6 +117,91 @@ public class StoreController {
         try{
             GetFoodInfoRes getFoodInfoRes = storeProvider.getFoodInfo(foodIdx);
             return new BaseResponse<>(getFoodInfoRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 우리 동네 빠른 배달 조회 API
+     * [GET] /stores/fast-delivery?type=1
+     * @return BaseResponse<List<GetFastStoreListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/fast-delivery") // (GET) 15.165.16.88:8000/stores/fast-delivery?type=1
+    public BaseResponse<List<GetFastStoreListRes>> getFastStoreLists(@RequestParam int type) {
+        try{
+            // type error message
+            if (type < 0 || type > 1) {
+                return new BaseResponse<>(GET_FAST_STORES_TYPE_ERROR);
+            }
+            // Get store lists
+            List<GetFastStoreListRes> getFastStoreListRes = storeProvider.getFastStoreLists(type);
+            return new BaseResponse<>(getFastStoreListRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 배민1에 새로 들어왔어요 조회 API
+     * [GET] /stores/baemin-one/new
+     * @return BaseResponse<List<GetNewStoreListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/baemin-one/new") // (GET) 15.165.16.88:8000/stores/baemin-one/new
+    public BaseResponse<List<GetNewStoreListRes>> getNewStoreList() {
+        try{
+            // Get store lists
+            List<GetNewStoreListRes> getNewStoreListRes = storeProvider.getNewStoreList();
+            return new BaseResponse<>(getNewStoreListRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 배민1 추천 조회 API
+     * [GET] /stores/baemin-one/list?sort=1
+     * @return BaseResponse<List<GetBaemin1StoreListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/baemin-one/list") // (GET) 15.165.16.88:8000/stores/baemin-one/list?sort=1
+    public BaseResponse<List<GetBaemin1StoreListRes>> getBaemin1StoreList(@RequestParam int sort) {
+        try{
+            // sort error message
+            if (sort < 1 || sort > 3) {
+                return new BaseResponse<>(GET_STORES_SORT_ERROR);
+            }
+            // Get store lists
+            List<GetBaemin1StoreListRes> getBaemin1StoreListRes = storeProvider.getBaemin1StoreList(sort);
+            return new BaseResponse<>(getBaemin1StoreListRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 이럴 때 포장/방문 해보세요 조회 API
+     * [GET] /stores/visit?tag=1
+     * @return BaseResponse<List<GetVisitStoreListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/visit") // (GET) 15.165.16.88:8000/stores/visit?tag=1
+    public BaseResponse<List<GetVisitStoreListRes>> getVisitStoreList(@RequestParam int tag) {
+        try{
+            // sort error message
+            if (tag < 1 || tag > 2) {
+                return new BaseResponse<>(GET_STORES_SORT_ERROR);
+            }
+
+            // Get store lists
+            List<GetVisitStoreListRes> getVisitStoreListRes = storeProvider.getVisitStoreList(tag);
+            return new BaseResponse<>(getVisitStoreListRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }

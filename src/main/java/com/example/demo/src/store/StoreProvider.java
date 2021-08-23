@@ -71,5 +71,49 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 우리 동네 빠른 배달 조회 API
+    public List<GetFastStoreListRes> getFastStoreLists(int type) throws BaseException{
+        try{
+            List<GetFastStoreListRes> getFastStoreListRes = storeDao.getFastStoreLists(type);
+            return getFastStoreListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [GET] 배민1에 새로 들어왔어요 조회 API
+    public List<GetNewStoreListRes> getNewStoreList() throws BaseException{
+        try{
+            List<GetNewStoreListRes> getNewStoreListRes = storeDao.getNewStoreList();
+            return getNewStoreListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [GET] 배민1 추천 조회 API
+    public List<GetBaemin1StoreListRes> getBaemin1StoreList(int sort) throws BaseException{
+        try{
+            List<GetBaemin1StoreListRes> getBaemin1StoreListRes = storeDao.getBaemin1StoreList(sort);
+            return getBaemin1StoreListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [GET] 이럴 때 포장/방문 해보세요 조회 API
+    public List<GetVisitStoreListRes> getVisitStoreList(int tag) throws BaseException{
+        try{
+            List<GetVisitStoreListRes> getVisitStoreListRes = storeDao.getVisitStoreList(tag);
+            return getVisitStoreListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
 }

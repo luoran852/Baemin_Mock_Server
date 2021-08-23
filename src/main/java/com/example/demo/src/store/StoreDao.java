@@ -31,8 +31,8 @@ public class StoreDao {
                     "join (select R.storeIdx, count(storeIdx) reviewNum\n" +
                     "from Review R\n" +
                     "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx,\n" +
-                    "     Category Ca join CategoryStore CS on Ca.idx = CS.idx,\n" +
-                    "     Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "     Category Ca join CategoryStore CS on Ca.idx = CS.categotyIdx,\n" +
+                    "     Type T join TypeStore TS on T.idx = TS.typeIdx\n" +
                     "where T.idx = ? and Ca.idx = ?\n" +
                     "order by deliveryTime asc";
 
@@ -47,8 +47,8 @@ public class StoreDao {
                     "join (select R.storeIdx, count(storeIdx) reviewNum\n" +
                     "from Review R\n" +
                     "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx,\n" +
-                    "     Category Ca join CategoryStore CS on Ca.idx = CS.idx,\n" +
-                    "     Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "     Category Ca join CategoryStore CS on Ca.idx = CS.categotyIdx,\n" +
+                    "     Type T join TypeStore TS on T.idx = TS.typeIdx\n" +
                     "where T.idx = ? and Ca.idx = ?\n" +
                     "order by deliveryTip asc";
 
@@ -63,8 +63,8 @@ public class StoreDao {
                     "join (select R.storeIdx, count(storeIdx) reviewNum\n" +
                     "from Review R\n" +
                     "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx,\n" +
-                    "     Category Ca join CategoryStore CS on Ca.idx = CS.idx,\n" +
-                    "     Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "     Category Ca join CategoryStore CS on Ca.idx = CS.categotyIdx,\n" +
+                    "     Type T join TypeStore TS on T.idx = TS.typeIdx\n" +
                     "where T.idx = ? and Ca.idx = ?";
 
             getContentsParams1 = type;
@@ -226,6 +226,185 @@ public class StoreDao {
                         rs.getInt("flavorIdx"),
                         rs.getString("flavorTxt"),
                         rs.getInt("flavorPrice")),
+                getContentsParams);
+    }
+
+    // [GET] 우리 동네 빠른 배달 조회 API
+    public List<GetFastStoreListRes> getFastStoreLists(int type) {
+        String getContentsQuery = "";
+
+        // 홈
+        if (type == 0) {
+            getContentsQuery = "select idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
+                    "from Store S\n" +
+                    "order by rand()";
+        }
+
+        // 배달
+        if (type == 1) {
+            getContentsQuery = "select S.idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
+                    "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "where T.idx = 1\n" +
+                    "order by rand()";
+        }
+
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetFastStoreListRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("storePosterUrl"),
+                        rs.getString("storeName"),
+                        rs.getInt("isPacking"),
+                        rs.getInt("isNew"),
+                        rs.getInt("isCoupon"),
+                        rs.getFloat("rating"),
+                        rs.getInt("deliveryTip"),
+                        rs.getInt("deliveryTime"),
+                        getCatMenuInfo(rs.getInt("storeIdx"))
+                        )
+        );
+    }
+
+    // [GET] 카테고리 & 메인메뉴 1개 (Plus 쿼리)
+    public GetCatMenuInfoRes getCatMenuInfo(int storeIdx){
+        String getContentsQuery = "select Ca.categoryTxt, F.foodTxt\n" +
+                "from Store S join Food F on F.menuIdx = S.idx,\n" +
+                "     Category Ca join CategoryStore CS on Ca.idx = CS.categotyIdx\n" +
+                "where CS.storeIdx = F.menuIdx and S.idx = ?\n" +
+                "limit 1";
+        int getContentsParams = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetCatMenuInfoRes(
+                        rs.getString("categoryTxt"),
+                        rs.getString("foodTxt")),
+                getContentsParams);
+    }
+
+    // [GET] 배민1에 새로 들어왔어요 조회 API
+    public List<GetNewStoreListRes> getNewStoreList() {
+
+        String getContentsQuery = "select S.idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
+                    "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "where T.idx = 1\n" +
+                    "order by rand()";
+
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetNewStoreListRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("storePosterUrl"),
+                        rs.getString("storeName"),
+                        rs.getInt("isPacking"),
+                        rs.getInt("isNew"),
+                        rs.getInt("isCoupon"),
+                        rs.getFloat("rating"),
+                        rs.getInt("deliveryTip"),
+                        rs.getInt("deliveryTime"))
+        );
+    }
+
+    // [GET] 배민1 추천 조회 API
+    public List<GetBaemin1StoreListRes> getBaemin1StoreList(int sort) {
+        String getContentsQuery = "";
+
+        // 배달 빠른순 (sort = 1)
+        if (sort == 1) {
+            getContentsQuery = "select S.idx storeIdx, storeName, rating, deliveryTime, deliMinOrderPrice, storeDistance, deliveryTip, isNew, isCoupon\n" +
+                    "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "where T.idx = 2\n" +
+                    "order by deliveryTime asc";
+        }
+
+        // 배달팁 낮은순 (sort = 2)
+        if (sort == 2) {
+            getContentsQuery = "select S.idx storeIdx, storeName, rating, deliveryTime, deliMinOrderPrice, storeDistance, deliveryTip, isNew, isCoupon\n" +
+                    "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "where T.idx = 2\n" +
+                    "order by deliveryTip asc";
+        }
+
+        // 기본순 (sort = 3)
+        if (sort == 3) {
+            getContentsQuery = "select S.idx storeIdx, storeName, rating, deliveryTime, deliMinOrderPrice, storeDistance, deliveryTip, isNew, isCoupon\n" +
+                    "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
+                    "where T.idx = 2\n" +
+                    "order by rand()";
+        }
+
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetBaemin1StoreListRes(
+                        getBaeminOneImages(rs.getInt("storeIdx")),
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName"),
+                        rs.getFloat("rating"),
+                        rs.getInt("deliveryTime"),
+                        rs.getInt("deliMinOrderPrice"),
+                        rs.getFloat("storeDistance"),
+                        rs.getInt("deliveryTip"),
+                        rs.getInt("isNew"),
+                        rs.getInt("isCoupon"))
+                );
+    }
+
+    // [GET] 배민1 이미지 3개 조회 (Plus 쿼리)
+    public List<String> getBaeminOneImages(int storeIdx){
+        String getContentsQuery = "select foodImgUrl\n" +
+                "from Food F\n" +
+                "where F.menuIdx = ?\n" +
+                "limit 3";
+        int getContentsParams = storeIdx;
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) ->
+                        rs.getString("foodImgUrl"),
+                getContentsParams);
+    }
+
+    // [GET] 이럴 때 포장/방문 해보세요 조회 API
+    public List<GetVisitStoreListRes> getVisitStoreList(int tag) {
+        String getContentsQuery = "";
+
+        // #영화 (tag = 1)
+        if (tag == 1) {
+            getContentsQuery = "select S.idx storeIdx, storeName, foodPosterUrl, deliveryTime\n" +
+                    "from Store S\n" +
+                    "where S.idx = 1 or S.idx = 3 or S.idx = 4 or S.idx = 5\n" +
+                    "order by rand()";
+        }
+
+        // #국물이 (tag = 2)
+        if (tag == 2) {
+            getContentsQuery = "select S.idx storeIdx, storeName, foodPosterUrl, deliveryTime\n" +
+                    "from Store S\n" +
+                    "where S.idx = 1 or S.idx = 3 or S.idx = 4\n" +
+                    "order by rand()";
+        }
+
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetVisitStoreListRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName"),
+                        rs.getString("foodPosterUrl"),
+                        rs.getInt("deliveryTime"),
+                        getVisitCategory(rs.getInt("storeIdx"))));
+    }
+
+    // [GET] 이럴 때 포장/방문 해보세요 조회 API (Plus 쿼리)
+    public GetVisitCateRes getVisitCategory(int storeIdx){
+        String getContentsQuery = "select Ca.categoryTxt, F.foodTxt\n" +
+                "from Store S join Food F on F.menuIdx = S.idx,\n" +
+                "     Category Ca join CategoryStore CS on Ca.idx = CS.categotyIdx\n" +
+                "where CS.storeIdx = F.menuIdx and S.idx = ?\n" +
+                "limit 1";
+        int getContentsParams = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetVisitCateRes(
+                        rs.getString("categoryTxt"),
+                        rs.getString("foodTxt")),
                 getContentsParams);
     }
 
