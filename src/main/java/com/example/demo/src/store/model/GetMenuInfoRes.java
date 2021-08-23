@@ -12,6 +12,7 @@ public class GetMenuInfoRes {
     private int foodIdx;
     private String foodTxt;
     private int foodTypeIdx;
+    private String foodTypeTxt;
     private String foodComment;
     private int foodPrice;
     private String foodImgUrl;

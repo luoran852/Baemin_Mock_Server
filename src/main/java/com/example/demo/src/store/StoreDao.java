@@ -172,7 +172,7 @@ public class StoreDao {
 
     // [GET] 가게 메뉴 조회 API (추가쿼리)
     public List<GetMenuInfoRes> getMenuInfo(int storeIdx){
-        String getContentsQuery = "select F.idx foodIdx, F.foodTxt, FTF.foodTypeIdx, F.foodComment, F.foodPrice, F.foodImgUrl, F.isPopular, F.isSoldOut, F.isAlcohol\n" +
+        String getContentsQuery = "select F.idx foodIdx, F.foodTxt, FTF.foodTypeIdx, FTF.foodTypeTxt, F.foodComment, F.foodPrice, F.foodImgUrl, F.isPopular, F.isSoldOut, F.isAlcohol\n" +
                 "from Food F\n" +
                 "join FoodTypeFood FTF on F.idx = FTF.foodIdx\n" +
                 "where F.menuIdx = ?\n" +
@@ -184,6 +184,7 @@ public class StoreDao {
                         rs.getInt("foodIdx"),
                         rs.getString("foodTxt"),
                         rs.getInt("foodTypeIdx"),
+                        rs.getString("foodTypeTxt"),
                         rs.getString("foodComment"),
                         rs.getInt("foodPrice"),
                         rs.getString("foodImgUrl"),
