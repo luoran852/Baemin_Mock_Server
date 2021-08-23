@@ -408,5 +408,25 @@ public class StoreDao {
                 getContentsParams);
     }
 
+    // [GET] 가게 쿠폰 조회 API
+    public List<GetStoreCouponListRes> getStoreCouponList(int storeIdx) {
+
+        String getContentsQuery = "select C.idx couponIdx, couponPrice, isDelivery, isPacking, minOrder, validity, isDownloaded\n" +
+                "from Coupon C join CouponUser CU on C.idx = CU.couponIdx\n" +
+                "where C.storeIdx = ?";
+        int getContentsParams = storeIdx;
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetStoreCouponListRes(
+                        rs.getInt("couponIdx"),
+                        rs.getInt("couponPrice"),
+                        rs.getInt("isDelivery"),
+                        rs.getInt("isPacking"),
+                        rs.getInt("minOrder"),
+                        rs.getInt("validity"),
+                        rs.getInt("isDownloaded")),
+                getContentsParams
+        );
+    }
 
 }

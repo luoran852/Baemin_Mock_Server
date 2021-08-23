@@ -115,5 +115,16 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 가게 쿠폰 조회 API
+    public List<GetStoreCouponListRes> getStoreCouponList(int storeIdx) throws BaseException{
+        try{
+            List<GetStoreCouponListRes> getStoreCouponListRes = storeDao.getStoreCouponList(storeIdx);
+            return getStoreCouponListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
 }

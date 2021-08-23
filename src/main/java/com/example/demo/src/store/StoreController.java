@@ -196,12 +196,38 @@ public class StoreController {
         try{
             // sort error message
             if (tag < 1 || tag > 2) {
-                return new BaseResponse<>(GET_STORES_SORT_ERROR);
+                return new BaseResponse<>(GET_STORES_TAG_ERROR);
             }
 
             // Get store lists
             List<GetVisitStoreListRes> getVisitStoreListRes = storeProvider.getVisitStoreList(tag);
             return new BaseResponse<>(getVisitStoreListRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 가게 쿠폰 조회 API
+     * [GET] /stores/:storeIdx/coupons
+     * @return BaseResponse<List<GetVisitStoreListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/{storeIdx}/coupons") // (GET) 15.165.16.88:8000/stores/:storeIdx/coupons
+    public BaseResponse<List<GetStoreCouponListRes>> getStoreCouponList(@PathVariable("storeIdx") int storeIdx) {
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            // storeIdx error message
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
+
+            // Get Coupon lists
+            List<GetStoreCouponListRes> getStoreCouponListRes = storeProvider.getStoreCouponList(storeIdx);
+            return new BaseResponse<>(getStoreCouponListRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
