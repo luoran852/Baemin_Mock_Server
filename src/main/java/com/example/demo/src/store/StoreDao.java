@@ -1,6 +1,7 @@
 package com.example.demo.src.store;
 
 import com.example.demo.src.store.model.*;
+import com.example.demo.src.user.model.PostUserReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -427,6 +428,16 @@ public class StoreDao {
                         rs.getInt("isDownloaded")),
                 getContentsParams
         );
+    }
+
+    // [POST] 가게 리뷰 올리기 API
+    public int postReview(PostReviewReq postReviewReq, int userIdxByJwt, int storeIdx){
+        String createReviewQuery = "insert into Review (storeIdx, userIdx, nickName, rating, reviewTxt, reviewImgUrl) values (?, ?, ?, ?, ?, ifnull(?, null))";
+        Object[] createUserParams = new Object[]{storeIdx, userIdxByJwt, postReviewReq.getNickName(), postReviewReq.getRating(), postReviewReq.getReviewTxt(), postReviewReq.getReviewImgUrl()};
+        this.jdbcTemplate.update(createReviewQuery, createUserParams);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
     }
 
 }

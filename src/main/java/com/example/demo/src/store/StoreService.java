@@ -3,6 +3,7 @@ package com.example.demo.src.store;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.secret.Secret;
 import com.example.demo.src.store.model.*;
+import com.example.demo.src.user.model.*;
 import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -34,6 +35,17 @@ public class StoreService {
     }
 
 
+
+    // [POST] 가게 리뷰 올리기 API
+    public PostReviewRes postReview(PostReviewReq postReviewReq, int userIdxByJwt, int storeIdx) throws BaseException {
+
+        try{
+            int reviewIdx = storeDao.postReview(postReviewReq, userIdxByJwt, storeIdx);
+            return new PostReviewRes(reviewIdx);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
 

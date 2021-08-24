@@ -3,6 +3,8 @@ package com.example.demo.src.store;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.store.model.*;
+import com.example.demo.src.user.model.PostLoginReq;
+import com.example.demo.src.user.model.PostLoginRes;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,6 +232,25 @@ public class StoreController {
             return new BaseResponse<>(getStoreCouponListRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 가게 리뷰 올리기 API
+     * [POST] /stores/:storeIdx/review
+     * @return BaseResponse<PostReviewRes>
+     */
+    @ResponseBody
+    @PostMapping("/{storeIdx}/review") // (POST) 15.165.16.88:8000/stores/:storeIdx/review
+    public BaseResponse<PostReviewRes> postReview(@RequestBody PostReviewReq postReviewReq, @PathVariable("storeIdx") int storeIdx){
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            PostReviewRes postReviewRes = storeService.postReview(postReviewReq, userIdxByJwt, storeIdx);
+            return new BaseResponse<>(postReviewRes);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
