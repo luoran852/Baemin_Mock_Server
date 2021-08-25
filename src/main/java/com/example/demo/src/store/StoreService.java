@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.sql.DataSource;
 
@@ -47,7 +48,17 @@ public class StoreService {
         }
     }
 
+    // 가게 사장님 댓글 올리기 API
+    public PostBossCommentRes postBossComment(PostBossCommentReq postBossCommentReq, int userIdxByJwt, int storeIdx, int reviewIdx) throws BaseException {
 
+        try{
+            storeDao.postBossComment(postBossCommentReq, userIdxByJwt, storeIdx, reviewIdx);
+            String result = "가게 사장님 댓글 올리기 성공";
+            return new PostBossCommentRes(result);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
 }

@@ -3,6 +3,7 @@ package com.example.demo.src.store;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.store.model.*;
+import com.example.demo.src.user.model.PostEmailCheckRes;
 import com.example.demo.src.user.model.PostLoginReq;
 import com.example.demo.src.user.model.PostLoginRes;
 import com.example.demo.utils.JwtService;
@@ -212,7 +213,7 @@ public class StoreController {
     /**
      * 가게 쿠폰 조회 API
      * [GET] /stores/:storeIdx/coupons
-     * @return BaseResponse<List<GetVisitStoreListRes>>
+     * @return BaseResponse<List<GetStoreCouponListRes>>
      */
     //Query String
     @ResponseBody
@@ -251,6 +252,71 @@ public class StoreController {
             return new BaseResponse<>(postReviewRes);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 가게 사장님 댓글 올리기 API
+     * [POST] /stores/:storeIdx/boss-comment/:reviewIdx
+     * @return BaseResponse<PostBossCommentRes>
+     */
+    @ResponseBody
+    @PostMapping("/{storeIdx}/boss-comment/{reviewIdx}") // (POST) 15.165.16.88:8000/stores/:storeIdx/boss-comment/:reviewIdx
+    public BaseResponse<PostBossCommentRes> postBossComment(@RequestBody PostBossCommentReq postBossCommentReq, @PathVariable("storeIdx") int storeIdx, @PathVariable("reviewIdx") int reviewIdx){
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //jwt와 userIdx가 같은 유저인지 확인
+            if (postBossCommentReq.getUserIdx() != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+            PostBossCommentRes postBossCommentRes = storeService.postBossComment(postBossCommentReq, userIdxByJwt, storeIdx, reviewIdx);
+
+            return new BaseResponse<>(postBossCommentRes);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 가게 리뷰 정보 조회 API
+     * [GET] /stores/:storeIdx/review
+     * @return BaseResponse<GetReviewRes>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/{storeIdx}/review") // (GET) 15.165.16.88:8000/stores/:storeIdx/review
+    public BaseResponse<GetReviewRes> getReview(@PathVariable("storeIdx") int storeIdx) {
+        // Get Food Info
+        try{
+            GetReviewRes getReviewRes = storeProvider.getReview(storeIdx);
+            return new BaseResponse<>(getReviewRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 가게 사용자 리뷰 조회 API
+     * [GET] /stores/:storeIdx/user-review?sort=1
+     * @return BaseResponse<List<GetUserReviewListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/{storeIdx}/user-review") // (GET) 15.165.16.88:8000/stores/:storeIdx/user-review?sort=1
+    public BaseResponse<List<GetUserReviewListRes>> getUserReviewList(@PathVariable("storeIdx") int storeIdx, @RequestParam int sort) {
+        try{
+            // sort error message
+            if (sort < 1 || sort > 3) {
+                return new BaseResponse<>(GET_STORES_SORT_ERROR);
+            }
+
+            // Get User Review lists
+            List<GetUserReviewListRes> getUserReviewListRes = storeProvider.getUserReviewList(storeIdx, sort);
+            return new BaseResponse<>(getUserReviewListRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
         }
     }
 

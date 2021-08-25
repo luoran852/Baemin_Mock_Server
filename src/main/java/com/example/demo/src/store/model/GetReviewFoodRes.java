@@ -7,11 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostReviewReq {
-    private String nickName;
-    private float rating;
-    private String reviewTxt;
-    private String reviewImgUrl;
+public class GetReviewFoodRes {
     private String foodTxt1;
     private String foodTxt2;
     private String foodTxt3;

@@ -126,5 +126,26 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 가게 리뷰 정보 조회 API
+    public GetReviewRes getReview(int storeIdx) throws BaseException{
+        try{
+            GetReviewRes getReviewRes = storeDao.getReview(storeIdx);
+            return getReviewRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [GET] 가게 사용자 리뷰 조회 API
+    public List<GetUserReviewListRes> getUserReviewList(int storeIdx, int sort) throws BaseException{
+        try{
+            List<GetUserReviewListRes> getUserReviewListRes = storeDao.getUserReviewList(storeIdx, sort);
+            return getUserReviewListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 }

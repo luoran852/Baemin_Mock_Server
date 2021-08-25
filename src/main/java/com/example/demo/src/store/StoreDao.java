@@ -1,6 +1,7 @@
 package com.example.demo.src.store;
 
 import com.example.demo.src.store.model.*;
+import com.example.demo.src.user.model.PatchUserReq;
 import com.example.demo.src.user.model.PostUserReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -432,12 +433,175 @@ public class StoreDao {
 
     // [POST] 가게 리뷰 올리기 API
     public int postReview(PostReviewReq postReviewReq, int userIdxByJwt, int storeIdx){
-        String createReviewQuery = "insert into Review (storeIdx, userIdx, nickName, rating, reviewTxt, reviewImgUrl) values (?, ?, ?, ?, ?, ifnull(?, null))";
-        Object[] createUserParams = new Object[]{storeIdx, userIdxByJwt, postReviewReq.getNickName(), postReviewReq.getRating(), postReviewReq.getReviewTxt(), postReviewReq.getReviewImgUrl()};
-        this.jdbcTemplate.update(createReviewQuery, createUserParams);
+        String createReviewQuery1 = "insert into ReviewFood (userIdx, storeIdx, foodTxt1, foodTxt2, foodTxt3) values (?, ?, ?, ifnull(?, null), ifnull(?, null))";
+        Object[] createUserParams1 = new Object[]{userIdxByJwt, storeIdx, postReviewReq.getFoodTxt1(), postReviewReq.getFoodTxt2(), postReviewReq.getFoodTxt3()};
+        this.jdbcTemplate.update(createReviewQuery1, createUserParams1);
+
+        String createReviewQuery2 = "insert into Review (storeIdx, userIdx, nickName, rating, reviewTxt, reviewImgUrl) values (?, ?, ?, ?, ifnull(?, null), ifnull(?, null))";
+        Object[] createUserParams2 = new Object[]{storeIdx, userIdxByJwt, postReviewReq.getNickName(), postReviewReq.getRating(), postReviewReq.getReviewTxt(), postReviewReq.getReviewImgUrl()};
+        this.jdbcTemplate.update(createReviewQuery2, createUserParams2);
 
         String lastInserIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
     }
+
+    // [POST] 가게 사장님 댓글 올리기 API
+    public int postBossComment(PostBossCommentReq postBossCommentReq, int userIdxByJwt, int storeIdx, int reviewIdx){
+        String createContentsQuery1 = "insert into BossComment (storeIdx, reviewIdx, userIdx, bossCommentTxt) values (?, ?, ?, ?)";
+        Object[] createContentsParams1 = new Object[]{storeIdx, reviewIdx, userIdxByJwt, postBossCommentReq.getBossCommentTxt()};
+
+        return this.jdbcTemplate.update(createContentsQuery1,createContentsParams1);
+    }
+
+    // [GET] 가게 리뷰 정보 조회 API
+    public GetReviewRes getReview(int storeIdx){
+        String getContentsQuery = "select distinct date_format(BN.createdAt, '%Y년 %c월 %e일') as bossNoticeDate, bossNoticeImgUrl, bossNoticeTxt, round(sum(rating) / count(R.idx), 1) as TotalRating,\n" +
+                "                (select count(R.idx) from Review R where R.rating = 5 and R.storeIdx = ?) as fiveRatingNum,\n" +
+                "                (select count(R.idx) from Review R where R.rating = 4 and R.storeIdx = ?) as fourRatingNum,\n" +
+                "                (select count(R.idx) from Review R where R.rating = 3 and R.storeIdx = ?) as threeRatingNum,\n" +
+                "                (select count(R.idx) from Review R where R.rating = 2 and R.storeIdx = ?) as twoRatingNum,\n" +
+                "                (select count(R.idx) from Review R where R.rating = 1 and R.storeIdx = ?) as oneRatingNum,\n" +
+                "                bossWordTxt, date_format(BN.createdAt, '%Y년 %c월 %e일') as bossWordDate\n" +
+                "from BossNotice BN join Review R on BN.storeIdx = R.storeIdx\n" +
+                "where BN.storeIdx = ?";
+        int getContentsParams1 = storeIdx;
+        int getContentsParams2 = storeIdx;
+        int getContentsParams3 = storeIdx;
+        int getContentsParams4 = storeIdx;
+        int getContentsParams5 = storeIdx;
+        int getContentsParams6 = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetReviewRes(
+                        rs.getString("bossNoticeDate"),
+                        rs.getString("bossNoticeImgUrl"),
+                        rs.getString("bossNoticeTxt"),
+                        rs.getDouble("TotalRating"),
+                        rs.getInt("fiveRatingNum"),
+                        rs.getInt("fourRatingNum"),
+                        rs.getInt("threeRatingNum"),
+                        rs.getInt("twoRatingNum"),
+                        rs.getInt("oneRatingNum"),
+                        rs.getString("bossWordTxt"),
+                        rs.getString("bossWordDate"),
+                        reviewNum(storeIdx)),
+                getContentsParams1, getContentsParams2, getContentsParams3, getContentsParams4, getContentsParams5, getContentsParams6);
+    }
+
+    // [GET] 가게 리뷰 조회 API (리뷰개수)- (추가 쿼리)
+    public GetReviewNumRes reviewNum(int storeIdx){
+        String getContentsQuery = "select distinct count(R.idx) as recentReviewNum, bossCommentNum\n" +
+                "from Review R\n" +
+                "join (select count(BC.idx) as bossCommentNum, userIdx\n" +
+                "        from BossComment BC where storeIdx = ?) as bossCommentNum\n" +
+                "where storeIdx = ?";
+        int getContentsParams1 = storeIdx;
+        int getContentsParams2 = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetReviewNumRes(
+                        rs.getInt("recentReviewNum"),
+                        rs.getInt("bossCommentNum")),
+                getContentsParams1, getContentsParams2);
+    }
+
+    // [GET] 사용자 리뷰 조회
+    public List<GetUserReviewListRes> getUserReviewList(int storeIdx, int sort) {
+
+        String getContentsQuery = "";
+
+        // 최신순 (sort = 1)
+        if (sort == 1) {
+            getContentsQuery = "select distinct R.idx reviewIdx, R.userIdx, R.nickName, profileUrl, rating, reviewImgUrl, reviewTxt, case\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 1\n" +
+                    "        then '오늘'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 2\n" +
+                    "        then '어제'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 3\n" +
+                    "        then '그제'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 7\n" +
+                    "        then '이번주'\n" +
+                    "    when timestampdiff(month , createdAt, current_timestamp()) < 1\n" +
+                    "        then '한달전'\n" +
+                    "    else\n" +
+                    "        date_format(createdAt, '%Y년-%m월-%d일') end as createdAt\n" +
+                    "from Review R join (select idx userIdx, nickName, profileUrl from User U) as User on R.userIdx = User.userIdx\n" +
+                    "where storeIdx = ?\n" +
+                    "order by createdAt asc";
+        }
+
+        // 별점높은순 (sort = 2)
+        if (sort == 2) {
+            getContentsQuery = "select distinct R.idx reviewIdx, R.userIdx, R.nickName, profileUrl, rating, reviewImgUrl, reviewTxt, case\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 1\n" +
+                    "        then '오늘'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 2\n" +
+                    "        then '어제'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 3\n" +
+                    "        then '그제'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 7\n" +
+                    "        then '이번주'\n" +
+                    "    when timestampdiff(month , createdAt, current_timestamp()) < 1\n" +
+                    "        then '한달전'\n" +
+                    "    else\n" +
+                    "        date_format(createdAt, '%Y년-%m월-%d일') end as createdAt\n" +
+                    "from Review R join (select idx userIdx, nickName, profileUrl from User U) as User on R.userIdx = User.userIdx\n" +
+                    "where storeIdx = ?\n" +
+                    "order by rating desc";
+        }
+
+        // 별점낮은순 (sort = 3)
+        if (sort == 3) {
+            getContentsQuery = "select distinct R.idx reviewIdx, R.userIdx, R.nickName, profileUrl, rating, reviewImgUrl, reviewTxt, case\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 1\n" +
+                    "        then '오늘'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 2\n" +
+                    "        then '어제'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 3\n" +
+                    "        then '그제'\n" +
+                    "    when timestampdiff(day, createdAt, current_timestamp()) < 7\n" +
+                    "        then '이번주'\n" +
+                    "    when timestampdiff(month , createdAt, current_timestamp()) < 1\n" +
+                    "        then '한달전'\n" +
+                    "    else\n" +
+                    "        date_format(createdAt, '%Y년-%m월-%d일') end as createdAt\n" +
+                    "from Review R join (select idx userIdx, nickName, profileUrl from User U) as User on R.userIdx = User.userIdx\n" +
+                    "where storeIdx = ?\n" +
+                    "order by rating asc";
+        }
+
+        int getContentsParams = storeIdx;
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetUserReviewListRes(
+                        rs.getInt("reviewIdx"),
+                        rs.getInt("userIdx"),
+                        rs.getString("nickName"),
+                        rs.getString("profileUrl"),
+                        rs.getFloat("rating"),
+                        rs.getString("reviewImgUrl"),
+                        rs.getString("reviewTxt"),
+                        rs.getString("createdAt"),
+                        getReviewFood(rs.getInt("userIdx"), getContentsParams)),
+                getContentsParams
+        );
+    }
+
+    // [GET] 사용자 리뷰 조회 (음식 선택 - 추가 쿼리)
+    public GetReviewFoodRes getReviewFood(int userIdx, int storeIdx){
+        String getContentsQuery = "select distinct foodTxt1, foodTxt2, foodTxt3\n" +
+                "from ReviewFood\n" +
+                "where userIdx =? and storeIdx = ?\n" +
+                "limit 3";
+        int getContentsParams1 = userIdx;
+        int getContentsParams2 = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetReviewFoodRes(
+                        rs.getString("foodTxt1"),
+                        rs.getString("foodTxt2"),
+                        rs.getString("foodTxt3")),
+                getContentsParams1, getContentsParams2);
+    }
+
 
 }
