@@ -36,7 +36,6 @@ public class StoreService {
     }
 
 
-
     // [POST] 가게 리뷰 올리기 API
     public PostReviewRes postReview(PostReviewReq postReviewReq, int userIdxByJwt, int storeIdx) throws BaseException {
 
@@ -48,7 +47,7 @@ public class StoreService {
         }
     }
 
-    // 가게 사장님 댓글 올리기 API
+    // [POST] 가게 사장님 댓글 올리기 API
     public PostBossCommentRes postBossComment(PostBossCommentReq postBossCommentReq, int userIdxByJwt, int storeIdx, int reviewIdx) throws BaseException {
 
         try{
@@ -60,5 +59,14 @@ public class StoreService {
         }
     }
 
+    // [POST] 주문하기 API
+    public GetOrderIdx postOrder(PostOrderReq postOrderReq, int userIdxByJwt, int storeIdx) throws BaseException {
+        try{
+            int orderIdx = storeDao.postOrderCalc(postOrderReq, userIdxByJwt, storeIdx);
+            return new GetOrderIdx(orderIdx);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 }

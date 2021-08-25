@@ -603,5 +603,105 @@ public class StoreDao {
                 getContentsParams1, getContentsParams2);
     }
 
+    // [GET] 주문하기 페이지 조회 API
+    public GetOrderPageRes getOrderPage(int userIdx, int storeIdx){
+        String getContentsQuery = "select distinct address, phoneNum, BP.payMoney, P.pointSavePrice\n" +
+                "from User U join Ordering O on U.idx = O.userIdx\n" +
+                "join BaeminPay BP on U.idx = BP.userIdx\n" +
+                "join Point P on U.idx = P.userIdx\n" +
+                "where O.storeIdx = ? and O.userIdx = ?";
+        int getContentsParams1 = storeIdx;
+        int getContentsParams2 = userIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetOrderPageRes(
+                        rs.getString("address"),
+                        rs.getString("phoneNum"),
+                        rs.getInt("payMoney"),
+                        getOrderingCouponList(userIdx)),
+                getContentsParams1, getContentsParams2);
+    }
+
+    // [GET] 주문하기 페이지 조회 API (추가쿼리 - 쿠폰 조회)
+    public List<GetOrderingCouponListRes> getOrderingCouponList(int userIdx) {
+
+        String getContentsQuery = "select distinct C.idx couponIdx, C.couponPrice, C.storeTxt, timestampdiff(day, current_timestamp, date_add(C.createdAt, interval 30 day)) as leftDate,\n" +
+                "                date_format(date_add(C.createdAt, interval 30 day), '%Y/%m/%d') as expireDate\n" +
+                "from Store S join Coupon C on S.idx = C.storeIdx\n" +
+                "    join CouponUser CU on C.idx = CU.couponIdx\n" +
+                "    join User U on CU.userIdx = U.idx\n" +
+                "where U.idx = ?";
+        int getContentsParams = userIdx;
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetOrderingCouponListRes(
+                        rs.getInt("couponIdx"),
+                        rs.getInt("couponPrice"),
+                        rs.getString("storeTxt"),
+                        rs.getInt("leftDate"),
+                        rs.getString("expireDate")),
+                getContentsParams
+        );
+    }
+
+    // [POST] 주문하기 API (메인 쿼리 - 돈 계산)
+    public int postOrderCalc(PostOrderReq postOrderReq, int userIdxByJwt, int storeIdx){
+
+        String createContentsQuery1 = "insert into\n" +
+                "    Ordering (userIdx, storeIdx, totalPrice, requestToStore, requestToRider, needSpoon, payMethodIdx, payMethodTxt)\n" +
+                "    values (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        Object[] createContentsParams1 = new Object[]{userIdxByJwt, storeIdx, postOrderReq.getTotalPrice(),
+                postOrderReq.getRequestToStore(), postOrderReq.getRequestToRider(), postOrderReq.getNeedSpoon(),
+                postOrderReq.getPayMethodIdx(), postOrderReq.getPayMethodTxt()};
+        this.jdbcTemplate.update(createContentsQuery1, createContentsParams1);
+
+        String createContentsQuery2 = "update BaeminPay BP\n" +
+                "    join Point P on BP.userIdx = P.userIdx\n" +
+                "    join CouponUser CU on P.userIdx = CU.userIdx\n" +
+                "set BP.payMoney = ?, P.pointUsePrice = ?,\n" +
+                "    CU.isDeleted = case when ? = 0 then 0 else 1 end where BP.userIdx = ?";
+
+        Object[] createContentsParams2 = new Object[]{postOrderReq.getUsedPayMoney(), postOrderReq.getUsedPoint(),
+                postOrderReq.getUsedCouponIdx(), userIdxByJwt};
+        this.jdbcTemplate.update(createContentsQuery2, createContentsParams2);
+
+        String lastInserIdQuery = "select idx\n" +
+                "from Ordering\n" +
+                "where userIdx = ? and storeIdx = ?\n" +
+                "order by idx desc\n" +
+                "limit 1";
+
+        int getContentsParams1 = userIdxByJwt;
+        int getContentsParams2 = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class, getContentsParams1, getContentsParams2);
+
+    }
+
+    // [POST] 주문하기 API (추가 쿼리)
+    public String saveOrderInfo(int orderIdx, PostOrderReq postOrderReq, int userIdxByJwt, int storeIdx){
+
+        String resultMsg = "주문하기 성공";
+        // 음식정보 담기
+        for (int i = 0; i < postOrderReq.getTotalFoodNum(); i++) {
+            String createContentsQuery1 = "update OrderFood\n" +
+                    "set orderIdx = ?, foodIdx = ?, flavorIdx = ?";
+            Object[] createContentsParams1 = new Object[]{orderIdx, postOrderReq.getFoodList().get(i).getFoodIdx(),
+                    postOrderReq.getFoodList().get(i).getFlavorIdx()};
+            this.jdbcTemplate.update(createContentsQuery1, createContentsParams1);
+        }
+
+
+        String createContentsQuery2 = "update OrderHistory\n" +
+                "set userIdx = ?, storeIdx = ?, orderIdx = ?, orderNumber = LEFT(MD5(RAND()), 10)";
+        Object[] createContentsParams2 = new Object[]{userIdxByJwt, storeIdx, orderIdx};
+        this.jdbcTemplate.update(createContentsQuery2, createContentsParams2);
+
+        return resultMsg;
+    }
+
+
+
 
 }

@@ -335,6 +335,52 @@ public class StoreController {
         }
     }
 
+    /**
+     * 주문하기 페이지 조회 API
+     * [GET] /stores/:storeIdx/order
+     * @return BaseResponse<GetReviewRes>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/{storeIdx}/order") // (GET) 15.165.16.88:8000/stores/:storeIdx/order
+    public BaseResponse<GetOrderPageRes> getOrderPage(@PathVariable("storeIdx") int storeIdx) throws BaseException {
+        // storeIdx error message
+        if (storeIdx < 1 || storeIdx > 6) {
+            return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+        }
+        //jwt에서 idx 추출.
+        int userIdxByJwt = jwtService.getUserIdx();
+        // Get Order Info
+        try{
+            GetOrderPageRes getOrderPageRes = storeProvider.getOrderPage(userIdxByJwt, storeIdx);
+            return new BaseResponse<>(getOrderPageRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 주문하기 API
+     * [POST] /stores/:storeIdx/order
+     * @return BaseResponse<PostReviewRes>
+     */
+    @ResponseBody
+    @PostMapping("/{storeIdx}/order") // (POST) 15.165.16.88:8000/stores/:storeIdx/order
+    public BaseResponse<GetOrderIdx> postOrder(@RequestBody PostOrderReq postOrderReq, @PathVariable("storeIdx") int storeIdx){
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            // storeIdx error message
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
+
+            GetOrderIdx getOrderIdx = storeService.postOrder(postOrderReq, userIdxByJwt, storeIdx);
+            return new BaseResponse<>(getOrderIdx);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
 
 

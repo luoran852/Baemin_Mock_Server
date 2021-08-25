@@ -148,4 +148,15 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 주문하기 페이지 조회 API
+    public GetOrderPageRes getOrderPage(int userIdxByJwt, int storeIdx) throws BaseException{
+        try{
+            GetOrderPageRes getOrderPageRes = storeDao.getOrderPage(userIdxByJwt, storeIdx);
+            return getOrderPageRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }
