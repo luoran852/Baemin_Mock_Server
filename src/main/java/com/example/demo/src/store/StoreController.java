@@ -247,6 +247,10 @@ public class StoreController {
         try{
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
+            // storeIdx error message
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
 
             PostReviewRes postReviewRes = storeService.postReview(postReviewReq, userIdxByJwt, storeIdx);
             return new BaseResponse<>(postReviewRes);
@@ -270,7 +274,10 @@ public class StoreController {
             if (postBossCommentReq.getUserIdx() != userIdxByJwt) {
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
-
+            // storeIdx error message
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
             PostBossCommentRes postBossCommentRes = storeService.postBossComment(postBossCommentReq, userIdxByJwt, storeIdx, reviewIdx);
 
             return new BaseResponse<>(postBossCommentRes);
@@ -288,6 +295,10 @@ public class StoreController {
     @ResponseBody
     @GetMapping("/{storeIdx}/review") // (GET) 15.165.16.88:8000/stores/:storeIdx/review
     public BaseResponse<GetReviewRes> getReview(@PathVariable("storeIdx") int storeIdx) {
+        // storeIdx error message
+        if (storeIdx < 1 || storeIdx > 6) {
+            return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+        }
         // Get Food Info
         try{
             GetReviewRes getReviewRes = storeProvider.getReview(storeIdx);
@@ -307,6 +318,10 @@ public class StoreController {
     @GetMapping("/{storeIdx}/user-review") // (GET) 15.165.16.88:8000/stores/:storeIdx/user-review?sort=1
     public BaseResponse<List<GetUserReviewListRes>> getUserReviewList(@PathVariable("storeIdx") int storeIdx, @RequestParam int sort) {
         try{
+            // storeIdx error message
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
             // sort error message
             if (sort < 1 || sort > 3) {
                 return new BaseResponse<>(GET_STORES_SORT_ERROR);
