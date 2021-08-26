@@ -192,4 +192,15 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 주문내역 조회 API
+    public List<GetOrderListRes> getOrderList(int userIdx) throws BaseException{
+        try{
+            List<GetOrderListRes> getOrderListRes = storeDao.getOrderList(userIdx);
+            return getOrderListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

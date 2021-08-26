@@ -803,6 +803,31 @@ public class StoreDao {
         );
     }
 
+    // [GET] 주문내역 조회 API
+    public List<GetOrderListRes> getOrderList(int userIdx) {
+
+        String getContentsQuery = "select distinct O.idx as orderIdx, S.idx storeIdx, storePosterUrl, storeName, mainFoodTxt,\n" +
+                "                (orderFoodNum - 1) as orderedFoodNum, totalPrice, date_format(O.createdAt, '0%c/%e (목)') as orderedDate\n" +
+                "from Store S join Ordering O on S.idx = O.storeIdx\n" +
+                "join User U on O.userIdx = U.idx\n" +
+                "where U.idx = ?\n" +
+                "order by O.idx";
+        int getContentsParams = userIdx;
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetOrderListRes(
+                        rs.getInt("orderIdx"),
+                        rs.getInt("storeIdx"),
+                        rs.getString("storePosterUrl"),
+                        rs.getString("storeName"),
+                        rs.getString("mainFoodTxt"),
+                        rs.getInt("orderedFoodNum"),
+                        rs.getInt("totalPrice"),
+                        rs.getString("orderedDate")),
+                getContentsParams
+        );
+    }
+
 
 
 

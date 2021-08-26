@@ -485,6 +485,27 @@ public class StoreController {
         }
     }
 
+    /**
+     * 주문내역 조회 API
+     * [GET] /stores/order-history
+     * @return BaseResponse<List<GetOrderListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/order-history") // (GET) 15.165.16.88:8000/stores/order-history
+    public BaseResponse<List<GetOrderListRes>> getOrderList() {
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            // Get Coupon lists
+            List<GetOrderListRes> getOrderListRes = storeProvider.getOrderList(userIdxByJwt);
+            return new BaseResponse<>(getOrderListRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
 
 
