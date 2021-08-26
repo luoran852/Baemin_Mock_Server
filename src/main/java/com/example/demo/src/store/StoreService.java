@@ -59,11 +59,22 @@ public class StoreService {
         }
     }
 
-    // [POST] 주문하기 API
+    // [POST] 주문하기 API (기본정보 담기)
     public GetOrderIdx postOrder(PostOrderReq postOrderReq, int userIdxByJwt, int storeIdx) throws BaseException {
         try{
             int orderIdx = storeDao.postOrderCalc(postOrderReq, userIdxByJwt, storeIdx);
             return new GetOrderIdx(orderIdx);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [POST] 주문하기 API (음식 담기)
+    public GetOrderFoodRes postOrderFood(PostOrderFoodReq postOrderFoodReq, int userIdxByJwt, int storeIdx) throws BaseException {
+
+        try{
+            GetOrderFoodRes getOrderFoodRes = storeDao.postOrderFood(postOrderFoodReq, userIdxByJwt, storeIdx);
+            return getOrderFoodRes;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

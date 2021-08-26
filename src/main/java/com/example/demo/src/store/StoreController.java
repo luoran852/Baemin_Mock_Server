@@ -356,7 +356,7 @@ public class StoreController {
     }
 
     /**
-     * 주문하기 API
+     * 주문하기 API (기본정보 담기)
      * [POST] /stores/:storeIdx/order
      * @return BaseResponse<PostReviewRes>
      */
@@ -373,6 +373,29 @@ public class StoreController {
 
             GetOrderIdx getOrderIdx = storeService.postOrder(postOrderReq, userIdxByJwt, storeIdx);
             return new BaseResponse<>(getOrderIdx);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 주문하기 API (음식 담기)
+     * [POST] /stores/:storeIdx/order-food
+     * @return BaseResponse<PostReviewRes>
+     */
+    @ResponseBody
+    @PostMapping("/{storeIdx}/order-food") // (POST) 15.165.16.88:8000/stores/:storeIdx/order
+    public BaseResponse<GetOrderFoodRes> postOrderFood(@RequestBody PostOrderFoodReq postOrderFoodReq, @PathVariable("storeIdx") int storeIdx){
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            // storeIdx error message
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
+
+            GetOrderFoodRes getOrderFoodRes = storeService.postOrderFood(postOrderFoodReq, userIdxByJwt, storeIdx);
+            return new BaseResponse<>(getOrderFoodRes);
         } catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }

@@ -644,7 +644,7 @@ public class StoreDao {
         );
     }
 
-    // [POST] 주문하기 API (메인 쿼리 - 돈 계산)
+    // [POST] 주문하기 API (기본정보 담기 - 돈 계산)
     public int postOrderCalc(PostOrderReq postOrderReq, int userIdxByJwt, int storeIdx){
 
         String createContentsQuery1 = "insert into\n" +
@@ -679,26 +679,35 @@ public class StoreDao {
 
     }
 
-    // [POST] 주문하기 API (추가 쿼리)
-    public String saveOrderInfo(int orderIdx, PostOrderReq postOrderReq, int userIdxByJwt, int storeIdx){
+    // [POST] 주문하기 API (음식 담기)
+    public GetOrderFoodRes postOrderFood(PostOrderFoodReq postOrderFoodReq, int userIdxByJwt, int storeIdx){
 
-        String resultMsg = "주문하기 성공";
         // 음식정보 담기
-        for (int i = 0; i < postOrderReq.getTotalFoodNum(); i++) {
-            String createContentsQuery1 = "update OrderFood\n" +
-                    "set orderIdx = ?, foodIdx = ?, flavorIdx = ?";
-            Object[] createContentsParams1 = new Object[]{orderIdx, postOrderReq.getFoodList().get(i).getFoodIdx(),
-                    postOrderReq.getFoodList().get(i).getFlavorIdx()};
+        for (int i = 0; i < postOrderFoodReq.getTotalFoodNum(); i++) {
+            String createContentsQuery1 = "insert into OrderFood (orderIdx, foodIdx, flavorIdx)\n" +
+                    "values (?, ?, ?)";
+            Object[] createContentsParams1 = new Object[]{postOrderFoodReq.getOrderIdx(), postOrderFoodReq.getFoodList().get(i).getFoodIdx(),
+                    postOrderFoodReq.getFoodList().get(i).getFlavorIdx()};
             this.jdbcTemplate.update(createContentsQuery1, createContentsParams1);
         }
 
 
-        String createContentsQuery2 = "update OrderHistory\n" +
-                "set userIdx = ?, storeIdx = ?, orderIdx = ?, orderNumber = LEFT(MD5(RAND()), 10)";
-        Object[] createContentsParams2 = new Object[]{userIdxByJwt, storeIdx, orderIdx};
+        String createContentsQuery2 = "insert into OrderHistory (userIdx, storeIdx, orderIdx, orderNumber)\n" +
+                "values (?, ?, ?, LEFT(MD5(RAND()), 10))";
+        Object[] createContentsParams2 = new Object[]{userIdxByJwt, storeIdx, postOrderFoodReq.getOrderIdx()};
+
         this.jdbcTemplate.update(createContentsQuery2, createContentsParams2);
 
-        return resultMsg;
+        String getContentsQuery3 = "select orderNumber\n" +
+                "from OrderHistory\n" +
+                "where orderIdx = ?";
+        int getContentsParams = postOrderFoodReq.getOrderIdx();
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery3,
+                (rs, rowNum) -> new GetOrderFoodRes(
+                        rs.getString("orderNumber")),
+                getContentsParams);
+
     }
 
 
