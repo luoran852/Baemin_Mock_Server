@@ -14,5 +14,6 @@ public class GetOrderPageRes {
     private String address;
     private String phoneNum;
     private int payMoney;
+    private int pointSavePrice;
     private List<GetOrderingCouponListRes> couponList;
 }

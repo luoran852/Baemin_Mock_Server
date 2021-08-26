@@ -604,22 +604,22 @@ public class StoreDao {
     }
 
     // [GET] 주문하기 페이지 조회 API
-    public GetOrderPageRes getOrderPage(int userIdx, int storeIdx){
+    public GetOrderPageRes getOrderPage(int userIdx){
         String getContentsQuery = "select distinct address, phoneNum, BP.payMoney, P.pointSavePrice\n" +
-                "from User U join Ordering O on U.idx = O.userIdx\n" +
+                "from User U\n" +
                 "join BaeminPay BP on U.idx = BP.userIdx\n" +
                 "join Point P on U.idx = P.userIdx\n" +
-                "where O.storeIdx = ? and O.userIdx = ?";
-        int getContentsParams1 = storeIdx;
-        int getContentsParams2 = userIdx;
+                "where U.idx = ?";
+        int getContentsParams1 = userIdx;
 
         return this.jdbcTemplate.queryForObject(getContentsQuery,
                 (rs, rowNum) -> new GetOrderPageRes(
                         rs.getString("address"),
                         rs.getString("phoneNum"),
                         rs.getInt("payMoney"),
+                        rs.getInt("pointSavePrice"),
                         getOrderingCouponList(userIdx)),
-                getContentsParams1, getContentsParams2);
+                getContentsParams1);
     }
 
     // [GET] 주문하기 페이지 조회 API (추가쿼리 - 쿠폰 조회)
