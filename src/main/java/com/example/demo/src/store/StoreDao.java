@@ -710,6 +710,34 @@ public class StoreDao {
 
     }
 
+    // [GET] 주문상태 확인 조회 API
+    public GetOrderCheckRes getOrderCheckPage(int orderIdx){
+        String getContentsQuery = "select distinct S.deliveryTime, DATE_FORMAT(DATE_ADD(DATE_SUB(now(), INTERVAL 3 HOUR ),\n" +
+                "    INTERVAL S.deliveryTime MINUTE), '%h:%i') as arrivalTime, OH.orderNumber, U.address, O.requestToStore,\n" +
+                "                O.requestToRider, S.storeName, foodNum, foodTxt, totalPrice\n" +
+                "from Store S join Ordering O on S.idx = O.storeIdx\n" +
+                "join (select orderIdx, foodIdx, (count(foodIdx) - 1) as foodNum from OrderFood OFD where orderIdx = ?) OFD on O.idx = OFD.orderIdx\n" +
+                "    join (select idx, foodTxt from Food F) food on food.idx = OFD.foodIdx\n" +
+                "join OrderHistory OH on O.idx = OH.orderIdx\n" +
+                "join User U on OH.userIdx = U.idx\n" +
+                "where O.idx = ?";
+        int getContentsParams1 = orderIdx;
+
+        return this.jdbcTemplate.queryForObject(getContentsQuery,
+                (rs, rowNum) -> new GetOrderCheckRes(
+                        rs.getInt("deliveryTime"),
+                        rs.getString("arrivalTime"),
+                        rs.getString("orderNumber"),
+                        rs.getString("address"),
+                        rs.getString("requestToStore"),
+                        rs.getString("requestToRider"),
+                        rs.getString("storeName"),
+                        rs.getInt("foodNum"),
+                        rs.getString("foodTxt"),
+                        rs.getInt("totalPrice")),
+                getContentsParams1, getContentsParams1);
+    }
+
 
 
 

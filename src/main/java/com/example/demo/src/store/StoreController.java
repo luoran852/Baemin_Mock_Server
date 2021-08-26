@@ -401,6 +401,24 @@ public class StoreController {
         }
     }
 
+    /**
+     * 주문상태 확인 조회 API
+     * [GET] /stores/order-status/:orderIdx
+     * @return BaseResponse<GetOrderPageRes>
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/order-status/{orderIdx}") // (GET) 15.165.16.88:8000/stores/order-status/:orderIdx
+    public BaseResponse<GetOrderCheckRes> getOrderCheckPage(@PathVariable("orderIdx") int orderIdx) {
+        // Get Order Check Info
+        try{
+            GetOrderCheckRes getOrderCheckRes = storeProvider.getOrderCheckPage(orderIdx);
+            return new BaseResponse<>(getOrderCheckRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
 
 

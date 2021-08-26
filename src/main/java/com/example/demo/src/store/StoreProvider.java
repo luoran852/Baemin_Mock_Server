@@ -159,4 +159,15 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 주문상태 확인 조회 API
+    public GetOrderCheckRes getOrderCheckPage(int orderIdx) throws BaseException{
+        try{
+            GetOrderCheckRes getOrderCheckRes = storeDao.getOrderCheckPage(orderIdx);
+            return getOrderCheckRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }
