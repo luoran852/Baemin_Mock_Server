@@ -404,7 +404,7 @@ public class StoreController {
     /**
      * 주문상태 확인 조회 API
      * [GET] /stores/order-status/:orderIdx
-     * @return BaseResponse<GetOrderPageRes>
+     * @return BaseResponse<GetOrderCheckRes>
      */
     // Path-variable
     @ResponseBody
@@ -414,6 +414,72 @@ public class StoreController {
         try{
             GetOrderCheckRes getOrderCheckRes = storeProvider.getOrderCheckPage(orderIdx);
             return new BaseResponse<>(getOrderCheckRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 최근에 주문했어요 API
+     * [GET] /stores/recent
+     * @return BaseResponse<List<GetStoreCouponListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/recent") // (GET) 15.165.16.88:8000/stores/recent
+    public BaseResponse<List<GetStoreRecentListRes>> getStoreRecentList() {
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            // Get Coupon lists
+            List<GetStoreRecentListRes> getStoreRecentListRes = storeProvider.getStoreRecentList(userIdxByJwt);
+            return new BaseResponse<>(getStoreRecentListRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 찜하기 API
+     * [POST] /stores/keep
+     * @return BaseResponse<PostStoreKeepRes>
+     */
+    @ResponseBody
+    @PostMapping("/keep") // (POST) 15.165.16.88:8000/stores/keep
+    public BaseResponse<PostStoreKeepRes> postStoreKeep(@RequestBody PostStoreKeepReq postStoreKeepReq){
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            // storeIdx error message
+            int storeIdx = postStoreKeepReq.getStoreIdx();
+            if (storeIdx < 1 || storeIdx > 6) {
+                return new BaseResponse<>(GET_STORES_STOREIDX_ERROR);
+            }
+
+            PostStoreKeepRes postStoreKeepRes = storeService.postStoreKeep(postStoreKeepReq, userIdxByJwt);
+            return new BaseResponse<>(postStoreKeepRes);
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 찜 조회 API
+     * [GET] /stores/keep
+     * @return BaseResponse<List<GetKeepListRes>>
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/keep") // (GET) 15.165.16.88:8000/stores/keep
+    public BaseResponse<List<GetKeepListRes>> getKeepList() {
+        try{
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+
+            // Get Coupon lists
+            List<GetKeepListRes> getKeepListRes = storeProvider.getKeepList(userIdxByJwt);
+            return new BaseResponse<>(getKeepListRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }

@@ -92,7 +92,7 @@ public class StoreDao {
         );
     }
 
-    // [GET] 가게리스트 메인메뉴 조회 API (추가 쿼리)
+    // [GET] 가게리스트 메인메뉴 / 찜 조회 API (추가 쿼리)
     public List<String> getMainMenu(int storeIdx){
         String getContentsQuery = "select distinct F.foodTxt\n" +
                 "from Store S\n" +
@@ -237,14 +237,14 @@ public class StoreDao {
 
         // 홈
         if (type == 0) {
-            getContentsQuery = "select distinct idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
+            getContentsQuery = "select distinct idx storeIdx, foodPosterUrl as storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
                     "from Store S\n" +
                     "order by rand()";
         }
 
         // 배달
         if (type == 1) {
-            getContentsQuery = "select distinct S.idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
+            getContentsQuery = "select distinct S.idx storeIdx, foodPosterUrl as storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
                     "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
                     "where T.idx = 1\n" +
                     "order by rand()";
@@ -286,10 +286,10 @@ public class StoreDao {
     // [GET] 배민1에 새로 들어왔어요 조회 API
     public List<GetNewStoreListRes> getNewStoreList() {
 
-        String getContentsQuery = "select distinct S.idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
-                    "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
-                    "where T.idx = 1\n" +
-                    "order by rand()";
+        String getContentsQuery = "select distinct S.idx storeIdx, foodPosterUrl as storePosterUrl, storeName, isPacking, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
+                "from Store S, Type T join TypeStore TS on T.idx = TS.idx\n" +
+                "where T.idx = 2 and S.isNew = 1\n" +
+                "order by rand()";
 
 
         return this.jdbcTemplate.query(getContentsQuery,
@@ -736,6 +736,71 @@ public class StoreDao {
                         rs.getString("foodTxt"),
                         rs.getInt("totalPrice")),
                 getContentsParams1, getContentsParams1);
+    }
+
+    // [GET] 최근에 주문했어요 API
+    public List<GetStoreRecentListRes> getStoreRecentList(int userIdx) {
+
+        String getContentsQuery = "select distinct S.idx storeIdx, foodPosterUrl, storeName, isNew, isCoupon, rating, deliveryTip, deliveryTime\n" +
+                "from Store S join Ordering O on S.idx = O.storeIdx\n" +
+                "join User U on O.userIdx = U.idx\n" +
+                "where U.idx = ?\n" +
+                "order by rand()";
+        int getContentsParams = userIdx;
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetStoreRecentListRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("foodPosterUrl"),
+                        rs.getString("storeName"),
+                        rs.getInt("isNew"),
+                        rs.getInt("isCoupon"),
+                        rs.getFloat("rating"),
+                        rs.getInt("deliveryTip"),
+                        rs.getInt("deliveryTime")),
+                getContentsParams
+        );
+    }
+
+    // [POST] 찜하기 API
+    public int postStoreKeep(PostStoreKeepReq postStoreKeepReq, int userIdxByJwt){
+        String getContentsQuery = "insert into Keep (userIdx, storeIdx, storeTxt)\n" +
+                "values (?, ?, ?)";
+        Object[] getContentsParams = new Object[]{userIdxByJwt, postStoreKeepReq.getStoreIdx(), postStoreKeepReq.getStoreTxt()};
+
+        this.jdbcTemplate.update(getContentsQuery, getContentsParams);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
+    }
+
+    // [GET] 가게 리스트 조회 API
+    public List<GetKeepListRes> getKeepList(int userIdx) {
+
+        String getContentsQuery = "select distinct S.idx storeIdx, storePosterUrl, storeName, isPacking, isNew, isCoupon, S.rating, reviewNum, deliMinOrderPrice, deliveryTip\n" +
+                "from Store S join Keep K on S.idx = K.storeIdx\n" +
+                "    join User U on K.userIdx = U.idx\n" +
+                "join (select R.storeIdx, count(storeIdx) reviewNum\n" +
+                "from Review R\n" +
+                "group by storeIdx) reviewNum on reviewNum.storeIdx = S.idx\n" +
+                "where U.idx = ?";
+        int getContentsParams = userIdx;
+
+        return this.jdbcTemplate.query(getContentsQuery,
+                (rs, rowNum) -> new GetKeepListRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("storePosterUrl"),
+                        rs.getString("storeName"),
+                        rs.getInt("isPacking"),
+                        rs.getInt("isNew"),
+                        rs.getInt("isCoupon"),
+                        rs.getFloat("rating"),
+                        rs.getInt("reviewNum"),
+                        getMainMenu(rs.getInt("storeIdx")),
+                        rs.getInt("deliMinOrderPrice"),
+                        rs.getInt("deliveryTip")),
+                getContentsParams
+        );
     }
 
 

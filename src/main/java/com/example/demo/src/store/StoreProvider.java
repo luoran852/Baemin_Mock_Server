@@ -170,4 +170,26 @@ public class StoreProvider {
         }
     }
 
+    // [GET] 최근에 주문했어요 API
+    public List<GetStoreRecentListRes> getStoreRecentList(int userIdx) throws BaseException{
+        try{
+            List<GetStoreRecentListRes> getStoreRecentListRes = storeDao.getStoreRecentList(userIdx);
+            return getStoreRecentListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [GET] 찜 조회 API
+    public List<GetKeepListRes> getKeepList(int userIdx) throws BaseException{
+        try{
+            List<GetKeepListRes> getKeepListRes = storeDao.getKeepList(userIdx);
+            return getKeepListRes;
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

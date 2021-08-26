@@ -80,4 +80,16 @@ public class StoreService {
         }
     }
 
+    // [POST] 찜하기 API
+    public PostStoreKeepRes postStoreKeep(PostStoreKeepReq postStoreKeepReq, int userIdxByJwt) throws BaseException {
+
+        try{
+            int keepIdx = storeDao.postStoreKeep(postStoreKeepReq, userIdxByJwt);
+            String resultMessage = "찜하기 성공";
+            return new PostStoreKeepRes(resultMessage, keepIdx);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }
