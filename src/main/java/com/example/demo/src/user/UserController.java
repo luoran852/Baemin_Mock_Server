@@ -1,5 +1,8 @@
 package com.example.demo.src.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
@@ -9,11 +12,18 @@ import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.utils.ValidationRegex.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -149,6 +159,63 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
 
+    }
+
+    /**
+     * 네이버 소셜로그인 API
+     * [POST] /users/naver-login
+     */
+    // 네이버 API 예제 - 회원프로필 조회
+    @ResponseBody
+    @PostMapping("/naver-login") // (GET) 15.165.16.88:8000/users/naver-login
+    public BaseResponse<PostNaverLoginRes> naverLogIn(@RequestBody PostNaverLoginReq postNaverLoginReq) {
+        try {
+            if (postNaverLoginReq.getNaverToken() == null) {
+                return new BaseResponse<>(POST_USERS_EMPTY_TOKEN);
+            }
+            String naverId = getNaverId(postNaverLoginReq.getNaverToken());
+            PostNaverLoginRes postNaverLoginRes = userService.naverLogIn(naverId);
+            return new BaseResponse<>(postNaverLoginRes);
+
+        } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    public String getNaverId (String naverToken) {
+        String token = naverToken; // 네아로 접근 토큰 값";
+        String header = "Bearer " + token; // Bearer 다음에 공백 추가
+        String naverId = "";
+        try {
+            String apiURL = "https://openapi.naver.com/v1/nid/me";
+            URL url = new URL(apiURL);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Authorization", header);
+            int responseCode = con.getResponseCode();
+            BufferedReader br;
+            if(responseCode==200) { // 정상 호출
+                br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            } else {  // 에러 발생
+                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            }
+            String inputLine;
+            ObjectMapper objectMapper =new ObjectMapper();
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = br.readLine()) != null) {
+                response.append(inputLine);
+                Map<String, String> apiJson = (Map<String, String>) objectMapper.readValue(inputLine, Map.class).get("response");
+                System.out.println(apiJson.get("id"));
+                naverId = apiJson.get("id");
+            }
+            br.close();
+            System.out.println(response);
+
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return naverId;
     }
 
 

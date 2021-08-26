@@ -97,4 +97,25 @@ public class UserService {
 
     }
 
+    // [POST] 네이버 소셜로그인 API
+    public PostNaverLoginRes naverLogIn(String naverId) throws BaseException {
+        try{
+            // 유저 존재 여부 체크
+            if(userProvider.checkNaver(naverId) == 1) {
+                int userIdx = userDao.getNaverId(naverId).getIdx();
+                String jwt = jwtService.createJwt(userIdx);
+                return new PostNaverLoginRes(userIdx,jwt);
+            }
+            // 유저 존재하지 않으면 네이버용 회원가입
+            else{
+                int userIdx = userDao.naverLogIn(naverId);
+                String jwt = jwtService.createJwt(userIdx);
+                return new PostNaverLoginRes(userIdx,jwt);
+            }
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+
 }

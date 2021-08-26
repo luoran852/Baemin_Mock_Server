@@ -13,4 +13,5 @@ public class User {
     private String email;
     private String pwd;
     private String phoneNum;
+    private String naverId;
 }

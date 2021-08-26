@@ -50,6 +50,14 @@ public class UserProvider {
         }
     }
 
+    public int checkNaver(String naverId) throws BaseException{
+        try{
+            return userDao.checkNaver(naverId);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
 
 }

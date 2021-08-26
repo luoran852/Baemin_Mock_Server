@@ -32,6 +32,7 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_PASSWORD(false, 2018, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_PASSWORD(false, 2019, "비밀번호 형식을 확인해주세요.(최소 8자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자)"),
     POST_USERS_INVALID_PHONE(false, 2020, "휴대폰번호 형식을 확인해주세요."),
+    POST_USERS_EMPTY_TOKEN(false, 2027, "네이버 토큰이 입력되지 않았습니다."),
 
     // [GET] /stores
     GET_STORES_TYPE_ERROR(false, 2021, "type을 확인해주세요.(1~7 사이)"),

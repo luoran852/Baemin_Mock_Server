@@ -31,7 +31,7 @@ public class UserDao {
                         rs.getString("profileUrl"),
                         rs.getString("nickname"),
                         rs.getString("email"),
-                        rs.getString("email"),
+                        rs.getString("phoneNum"),
                         rs.getString("userRate")),
                 getUserParams);
     }
@@ -56,10 +56,19 @@ public class UserDao {
 
     }
 
+    public int checkNaver(String naverId){
+        String checkNaverQuery = "select exists(select naverId from User where naverId = ?)";
+        String checkNaverParams = naverId;
+        return this.jdbcTemplate.queryForObject(checkNaverQuery,
+                int.class,
+                checkNaverParams);
+
+    }
+
 
     // [POST] 로그인 API
     public User getPwd(PostLoginReq postLoginReq){
-        String getPwdQuery = "select idx, nickname, email, pwd, phoneNum\n" +
+        String getPwdQuery = "select idx, nickname, email, pwd, phoneNum, naverId\n" +
                 "from User\n" +
                 "where email = ?";
         String getPwdParams = postLoginReq.getEmail();
@@ -70,11 +79,43 @@ public class UserDao {
                         rs.getString("nickname"),
                         rs.getString("email"),
                         rs.getString("pwd"),
-                        rs.getString("phoneNum")
+                        rs.getString("phoneNum"),
+                        rs.getString("naverId")
                 ),
                 getPwdParams
                 );
 
+    }
+
+    // [POST] 로그인 API
+    public User getNaverId(String naverId){
+        String getNaverIdQuery = "select idx, nickname, email, pwd, phoneNum, naverId\n" +
+                "from User\n" +
+                "where naverId = ?";
+        String getNaverIdParams = naverId;
+
+        return this.jdbcTemplate.queryForObject(getNaverIdQuery,
+                (rs,rowNum)-> new User(
+                        rs.getInt("idx"),
+                        rs.getString("nickname"),
+                        rs.getString("email"),
+                        rs.getString("pwd"),
+                        rs.getString("phoneNum"),
+                        rs.getString("naverId")
+                ),
+                getNaverIdParams
+        );
+    }
+
+    // [POST] 네이버 로그인 API
+    public int naverLogIn(String naverId){
+        String createUserQuery = "insert into User (nickname, email, pwd, phoneNum, bitrhDate, naverId)\n" +
+                "values ('호롱롱', 'test123@naver.com', 'test123pwd*', '010-1234-5678', '2000.01.01', ?)";
+        String createUserParams = naverId;
+        this.jdbcTemplate.update(createUserQuery, createUserParams);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,int.class);
     }
 
 
